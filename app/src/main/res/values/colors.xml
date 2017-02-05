@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="goqueer_primary_theme_color">#8fdaef</color>
+    <color name="uofa_white_transparent">#ffffff</color>
+    <color name="uofa_light_green">#a0c7b3</color>
+    <color name="uofa_grey">#d6d6d6</color>
+    <color name="uofa_dark_grey">#959595</color>
+    <color name="uofa_light_grey">#ededed</color>
+    <color name="uofa_yellow">#ffdb05</color>
+    <color name="uofa_light_yellow">#ffed81</color>
+    <color name="uofa_darker_grey">#464646</color>
+    <color name="uofa_black">#000000</color>
+    <color name="uofa_black_overlay">#66000000</color>
+    <color name="uofa_light_red">#43ff1d25</color>
+    <color name="uofa_dark_red">#ff1d25</color>
+
+    //Time table colors
+    <color name="uofa_timetable_color_1">#B9005F</color>
+    <color name="uofa_timetable_color_2">#FF3A51</color>
+    <color name="uofa_timetable_color_3">#008FFF</color>
+    <color name="uofa_timetable_color_4">#F4AC00</color>
+    <color name="uofa_timetable_color_5">#FF7600</color>
+    <color name="uofa_timetable_color_6">#29C4A2</color>
+    <color name="uofa_timetable_color_7">#005F94</color>
+    <color name="uofa_timetable_color_8">#00A14B</color>
+
+
+
+</resources>
