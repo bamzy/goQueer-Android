@@ -28,11 +28,10 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-    }
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
+
 
     }
+
 
 
         @Override

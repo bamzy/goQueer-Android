@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ca.ualberta.huco.goqueer_android">
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -19,6 +20,17 @@
         </activity>
         <activity
             android:name=".activity.MainActivity"
+            android:label="@string/title_activity_user_main"
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
+        <activity
+            android:name=".activity.MapActivity"
             android:label="@string/title_activity_user_main"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">

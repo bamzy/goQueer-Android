@@ -49,7 +49,7 @@ public class SplashScreenActivity extends Activity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                navigateToMainActivity();
+                navigateToMapActivity();
             }
         }, SPLASH_DISPLAY_LENGTH);
 
@@ -58,9 +58,15 @@ public class SplashScreenActivity extends Activity {
 
 
     private void navigateToMainActivity() {
-        //TODO passed parameters in here will change depending on the information required
+
         Intent userMainMenu = new Intent(SplashScreenActivity.this, MainActivity.class);
         startActivity(userMainMenu);
+        finish();
+    }
+    private void navigateToMapActivity() {
+
+        Intent map = new Intent(SplashScreenActivity.this, MapActivity.class);
+        startActivity(map);
         finish();
     }
 
