@@ -5,12 +5,11 @@ import android.util.Log;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.Serializable;
 
-import ca.ualberta.dev.myualberta.config.Constants;
+import ca.ualberta.huco.goqueer_android.config.Constants;
+
 
 /**
  * Created by bamdad on 7/29/2016.

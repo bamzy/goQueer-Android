@@ -1,18 +1,17 @@
 package ca.ualberta.huco.goqueer_android.uoda.response_type;
 
 
-import android.content.SharedPreferences;
 
 import com.google.gson.JsonObject;
+
 
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
-import java.text.DateFormat;
 
-import ca.ualberta.dev.myualberta.config.Constants;
-import ca.ualberta.dev.myualberta.network.AuthManager;
-import ca.ualberta.dev.myualberta.storage.StorageManager;
+import ca.ualberta.huco.goqueer_android.config.Constants;
+import ca.ualberta.huco.goqueer_android.network.AuthManager;
+import ca.ualberta.huco.goqueer_android.storage.StorageManager;
 
 /**
  * Created by bamdad on 7/15/2016.

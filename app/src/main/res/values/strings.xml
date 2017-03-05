@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Goqueer</string>
+    <string name="app_name">GoQueer\nv1.0</string>
     <string name="title_activity_user_main">GoQueer App</string>
     <string name="action_settings">Settings</string>
 </resources>

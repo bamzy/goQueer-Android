@@ -7,7 +7,8 @@ import com.google.gson.JsonObject;
 
 import java.io.Serializable;
 
-import ca.ualberta.dev.myualberta.config.Constants;
+import ca.ualberta.huco.goqueer_android.config.Constants;
+
 
 /**
  * Created by bamdad on 8/19/16.

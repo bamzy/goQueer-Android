@@ -1,21 +1,8 @@
 package ca.ualberta.huco.goqueer_android.uoda;
 
 
-import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import ca.ualberta.huco.goqueer_android.config.Constants;
-import ca.ualberta.huco.goqueer_android.network.Singletons;
 import ca.ualberta.huco.goqueer_android.uoda.call_objects.UMultiCallback;
 import ca.ualberta.huco.goqueer_android.uoda.call_objects.UODACall;
-import ca.ualberta.huco.goqueer_android.uoda.call_objects.UObjectCallback;
-import ca.ualberta.huco.goqueer_android.uoda.response_type.DataObject;
-import ca.ualberta.huco.goqueer_android.uoda.response_type.UPerson;
-import ca.ualberta.huco.goqueer_android.uoda.response_type.URoom;
-import ca.ualberta.huco.goqueer_android.uoda.response_type.UScheduleShare;
-import ca.ualberta.huco.goqueer_android.uoda.response_type.UTerm;
 
 
 /**
@@ -25,11 +12,7 @@ public class DataProvider {
 
     public static class Search {
 
-        public static void person(String keyword, final UMultiCallback callback) {
 
-            UODACall uodaCall = new UODACall("/contacts/search/" + keyword, null, UPerson[].class, callback);
-            uodaCall.getUODANoNull();
-        }
     }
 
 //    public static class Person {

@@ -2,10 +2,9 @@ package ca.ualberta.huco.goqueer_android.uoda.response_type;
 
 import java.io.Serializable;
 
-import ca.ualberta.dev.myualberta.config.Constants;
-import ca.ualberta.dev.myualberta.storage.StorageManager;
-import ca.ualberta.dev.myualberta.uoda.response_type.DataObject;
-import ca.ualberta.dev.myualberta.uoda.response_type.UPerson;
+import ca.ualberta.huco.goqueer_android.config.Constants;
+import ca.ualberta.huco.goqueer_android.storage.StorageManager;
+
 
 /**
  * Created by bamdad on 9/21/16.
@@ -19,13 +18,8 @@ public class AuthPersonDetails extends DataObject implements Serializable {
     private String mail;
     private String prefix;
 
-    public AuthPersonDetails(UPerson uPerson) {
-        this.ccid = uPerson.getCcid();
-        this.firstName = uPerson.getFirstName();
-        this.lastName = uPerson.getLastName();
-        this.displayName = uPerson.getDisplayName();
-        this.mail = uPerson.getMail();
-        this.prefix = uPerson.getPrefix();
+    public AuthPersonDetails() {
+
     }
 
     public AuthPersonDetails(StorageManager storageManager) {

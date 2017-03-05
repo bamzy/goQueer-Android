@@ -16,10 +16,11 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
 import java.util.HashMap;
 
-import ca.ualberta.dev.myualberta.config.Constants;
-import ca.ualberta.dev.myualberta.uoda.call_objects.UODACall;
-import ca.ualberta.dev.myualberta.uoda.call_objects.UMultiCallback;
-import ca.ualberta.dev.myualberta.uoda.response_type.DataObject;
+import ca.ualberta.huco.goqueer_android.config.Constants;
+import ca.ualberta.huco.goqueer_android.uoda.call_objects.UMultiCallback;
+import ca.ualberta.huco.goqueer_android.uoda.call_objects.UODACall;
+import ca.ualberta.huco.goqueer_android.uoda.response_type.DataObject;
+
 
 /**
  * Created by bamdad on 8/22/16.

@@ -2,12 +2,12 @@ package ca.ualberta.huco.goqueer_android.uoda.call_objects;
 
 import android.content.Context;
 import android.os.Handler;
-import android.provider.SyncStateContract;
 import android.util.Log;
 
 import java.util.ArrayList;
 
-import ca.ualberta.dev.myualberta.config.Constants;
+import ca.ualberta.huco.goqueer_android.config.Constants;
+
 
 /**
  * Created by bamdad on 9/21/16.

@@ -43,7 +43,7 @@ public class StorageManager {
         this.addPair(Constants.StorageKeys.Credential.PERSON_ID, uodaResponse.getPersonId());
         this.addPair(Constants.StorageKeys.Credential.REFRESH, uodaResponse.getRefreshToken());
         this.addPair(Constants.StorageKeys.Credential.EXPIRES_IN, Integer.toString(uodaResponse.getExpiresInt()));
-        this.addPair(Constants.StorageKeys.Credential.EXPIRY, Long.toString(uodaResponse.getExpiration().getMillis()));
+//        this.addPair(Constants.StorageKeys.Credential.EXPIRY, Long.toString(uodaResponse.getExpiration().getMillis()));
 
         UODAToken credentials = loadCredentials();
         Log.w(Constants.LOG_TAG, "Saved new token: " + credentials.getAccessToken());

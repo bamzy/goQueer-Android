@@ -29,10 +29,11 @@ public class AuthManager implements CallDelegate {
         return null;
     }
 
-    @Override
-    public UAEmergencyServiceClient getEmergencyClient() {
-        return null;
-    }
+
+//    @Override
+//    public UAEmergencyServiceClient getEmergencyClient() {
+//        return null;
+//    }
 
     public enum Status {
         User,
@@ -53,13 +54,13 @@ public class AuthManager implements CallDelegate {
     private UODAClient uodaClient = null;
 //
 //
-//    public AuthManager(Context context) {
-//        this.propertiesReader = new PropertiesReader(context);
-//        this.uodaConfiguration = new UODAConfiguration(propertiesReader.getPropertyDictionary());
-//        this.storageManager = new StorageManager(context);
-//        this.queueManager = new VolleyQueueManager(context);
-//        this.context = context;
-//    }
+    public AuthManager(Context context) {
+        this.propertiesReader = new PropertiesReader(context);
+        this.uodaConfiguration = new UODAConfiguration(propertiesReader.getPropertyDictionary());
+        this.storageManager = new StorageManager(context);
+        this.queueManager = new VolleyQueueManager(context);
+        this.context = context;
+    }
 //
 //    public VolleyQueueManager getQueueManager() {
 //        return queueManager;

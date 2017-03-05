@@ -24,7 +24,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
-import ca.ualberta.dev.myualberta.config.Constants;
+import ca.ualberta.huco.goqueer_android.config.Constants;
+
 
 /**
  * Created by bamdad on 7/27/2016.

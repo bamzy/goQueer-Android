@@ -5,7 +5,8 @@ import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
-import ca.ualberta.dev.myualberta.uoda.response_type.DataObject;
+import ca.ualberta.huco.goqueer_android.uoda.response_type.DataObject;
+
 
 /**
  * Created by bamdad on 8/23/16.
