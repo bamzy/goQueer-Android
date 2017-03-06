@@ -1,6 +1,4 @@
-package ca.ualberta.huco.goqueer_android.uoda;
-
-import android.util.Log;
+package ca.ualberta.huco.goqueer_android.server;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -14,8 +12,8 @@ import java.util.Map;
 
 import ca.ualberta.huco.goqueer_android.network.VolleyArrayCallback;
 import ca.ualberta.huco.goqueer_android.network.VolleyQueueManager;
-import ca.ualberta.huco.goqueer_android.uoda.response_type.DataObject;
-import ca.ualberta.huco.goqueer_android.uoda.response_type.UResponse;
+import ca.ualberta.huco.goqueer_android.server.response_type.DataObject;
+import ca.ualberta.huco.goqueer_android.server.response_type.UResponse;
 
 
 /**

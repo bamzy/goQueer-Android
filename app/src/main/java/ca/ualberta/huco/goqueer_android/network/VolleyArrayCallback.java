@@ -2,7 +2,7 @@ package ca.ualberta.huco.goqueer_android.network;
 
 import com.android.volley.VolleyError;
 
-import ca.ualberta.huco.goqueer_android.uoda.response_type.DataObject;
+import ca.ualberta.huco.goqueer_android.server.response_type.DataObject;
 
 
 /**

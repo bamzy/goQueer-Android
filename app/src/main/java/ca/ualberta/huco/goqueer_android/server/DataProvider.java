@@ -1,8 +1,4 @@
-package ca.ualberta.huco.goqueer_android.uoda;
-
-
-import ca.ualberta.huco.goqueer_android.uoda.call_objects.UMultiCallback;
-import ca.ualberta.huco.goqueer_android.uoda.call_objects.UODACall;
+package ca.ualberta.huco.goqueer_android.server;
 
 
 /**

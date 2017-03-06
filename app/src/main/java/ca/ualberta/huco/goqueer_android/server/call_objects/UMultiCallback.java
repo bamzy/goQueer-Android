@@ -1,7 +1,7 @@
-package ca.ualberta.huco.goqueer_android.uoda.call_objects;
+package ca.ualberta.huco.goqueer_android.server.call_objects;
 
 
-import ca.ualberta.huco.goqueer_android.uoda.response_type.DataObject;
+import ca.ualberta.huco.goqueer_android.server.response_type.DataObject;
 
 /**
  * Created by bamdad on 8/19/16.

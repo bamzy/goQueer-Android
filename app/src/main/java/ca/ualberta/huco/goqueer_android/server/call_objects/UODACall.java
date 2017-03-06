@@ -1,4 +1,4 @@
-package ca.ualberta.huco.goqueer_android.uoda.call_objects;
+package ca.ualberta.huco.goqueer_android.server.call_objects;
 
 import android.util.Log;
 
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import ca.ualberta.huco.goqueer_android.config.Constants;
 import ca.ualberta.huco.goqueer_android.network.Singletons;
 import ca.ualberta.huco.goqueer_android.network.VolleyArrayCallback;
-import ca.ualberta.huco.goqueer_android.uoda.response_type.DataObject;
+import ca.ualberta.huco.goqueer_android.server.response_type.DataObject;
 
 
 /**

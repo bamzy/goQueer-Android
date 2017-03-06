@@ -1,11 +1,11 @@
-package ca.ualberta.huco.goqueer_android.uoda.cache_provider;
+package ca.ualberta.huco.goqueer_android.server.cache_provider;
 
 
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
-import ca.ualberta.huco.goqueer_android.uoda.response_type.DataObject;
+import ca.ualberta.huco.goqueer_android.server.response_type.DataObject;
 
 
 /**

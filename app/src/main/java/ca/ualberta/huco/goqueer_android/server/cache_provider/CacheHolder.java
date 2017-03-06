@@ -1,4 +1,4 @@
-package ca.ualberta.huco.goqueer_android.uoda.cache_provider;
+package ca.ualberta.huco.goqueer_android.server.cache_provider;
 
 /**
  * Created by bamdad on 8/22/16.

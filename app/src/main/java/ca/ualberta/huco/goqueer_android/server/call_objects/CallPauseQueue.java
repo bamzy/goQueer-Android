@@ -1,4 +1,4 @@
-package ca.ualberta.huco.goqueer_android.uoda.call_objects;
+package ca.ualberta.huco.goqueer_android.server.call_objects;
 
 import android.content.Context;
 import android.os.Handler;

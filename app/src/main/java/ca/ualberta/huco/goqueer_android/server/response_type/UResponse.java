@@ -1,4 +1,4 @@
-package ca.ualberta.huco.goqueer_android.uoda.response_type;
+package ca.ualberta.huco.goqueer_android.server.response_type;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

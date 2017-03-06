@@ -1,4 +1,4 @@
-package ca.ualberta.huco.goqueer_android.uoda.cache_provider;
+package ca.ualberta.huco.goqueer_android.server.cache_provider;
 
 import android.content.Context;
 

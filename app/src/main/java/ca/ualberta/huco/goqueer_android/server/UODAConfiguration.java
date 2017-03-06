@@ -1,4 +1,4 @@
-package ca.ualberta.huco.goqueer_android.uoda;
+package ca.ualberta.huco.goqueer_android.server;
 
 import android.net.Uri;
 

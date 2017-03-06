@@ -1,4 +1,4 @@
-package ca.ualberta.huco.goqueer_android.uoda;
+package ca.ualberta.huco.goqueer_android.server;
 
 import android.util.Log;
 
@@ -17,8 +17,8 @@ import java.util.Map;
 import ca.ualberta.huco.goqueer_android.config.Constants;
 import ca.ualberta.huco.goqueer_android.network.VolleyQueueManager;
 import ca.ualberta.huco.goqueer_android.network.VolleySingleCallback;
-import ca.ualberta.huco.goqueer_android.uoda.response_type.UODACheck;
-import ca.ualberta.huco.goqueer_android.uoda.response_type.UODAToken;
+import ca.ualberta.huco.goqueer_android.server.response_type.UODACheck;
+import ca.ualberta.huco.goqueer_android.server.response_type.UODAToken;
 
 
 /**

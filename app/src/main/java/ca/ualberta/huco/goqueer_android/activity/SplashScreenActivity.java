@@ -20,17 +20,6 @@ import ca.ualberta.huco.goqueer_android.config.Constants;
 public class SplashScreenActivity extends Activity {
     private Context context;
 
-//    private class AuthCallback implements UObjectCallback {
-//        @Override
-//        public void onGotObject(DataObject uObject) {
-//            AuthPersonDetails personDetails = (AuthPersonDetails) uObject;
-//            if (personDetails == null) {
-//                navigateToLoginActivity();
-//            } else {
-//                navigateToUserActivity(personDetails);
-//            }
-//        }
-//    }
 
     /**
      * Called when the activity is first created.
@@ -38,7 +27,7 @@ public class SplashScreenActivity extends Activity {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        int SPLASH_DISPLAY_LENGTH = 1000;
+        int SPLASH_DISPLAY_LENGTH = 2000;
         setContentView(R.layout.activity_splash);
         context = this.getApplicationContext();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -46,25 +35,16 @@ public class SplashScreenActivity extends Activity {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(),R.color.goqueer_primary_theme_color));
         }
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 navigateToMapActivity();
             }
         }, SPLASH_DISPLAY_LENGTH);
-
-
     }
 
-
-    private void navigateToMainActivity() {
-
-        Intent userMainMenu = new Intent(SplashScreenActivity.this, MainActivity.class);
-        startActivity(userMainMenu);
-        finish();
-    }
     private void navigateToMapActivity() {
-
         Intent map = new Intent(SplashScreenActivity.this, MapActivity.class);
         startActivity(map);
         finish();

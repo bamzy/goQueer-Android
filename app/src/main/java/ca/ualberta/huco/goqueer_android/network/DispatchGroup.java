@@ -1,8 +1,6 @@
 package ca.ualberta.huco.goqueer_android.network;
 
-import java.util.HashMap;
-
-import ca.ualberta.huco.goqueer_android.uoda.call_objects.BoolCallback;
+import ca.ualberta.huco.goqueer_android.server.call_objects.BoolCallback;
 
 
 /**

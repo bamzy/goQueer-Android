@@ -1,4 +1,4 @@
-package ca.ualberta.huco.goqueer_android.uoda.cache_provider;
+package ca.ualberta.huco.goqueer_android.server.cache_provider;
 
 import android.content.Context;
 import android.util.Log;
@@ -17,9 +17,9 @@ import java.lang.reflect.Array;
 import java.util.HashMap;
 
 import ca.ualberta.huco.goqueer_android.config.Constants;
-import ca.ualberta.huco.goqueer_android.uoda.call_objects.UMultiCallback;
-import ca.ualberta.huco.goqueer_android.uoda.call_objects.UODACall;
-import ca.ualberta.huco.goqueer_android.uoda.response_type.DataObject;
+import ca.ualberta.huco.goqueer_android.server.call_objects.UMultiCallback;
+import ca.ualberta.huco.goqueer_android.server.call_objects.UODACall;
+import ca.ualberta.huco.goqueer_android.server.response_type.DataObject;
 
 
 /**

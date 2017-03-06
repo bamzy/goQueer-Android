@@ -4,8 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import ca.ualberta.huco.goqueer_android.config.Constants;
-import ca.ualberta.huco.goqueer_android.uoda.response_type.AuthPersonDetails;
-import ca.ualberta.huco.goqueer_android.uoda.response_type.UODAToken;
+import ca.ualberta.huco.goqueer_android.server.response_type.AuthPersonDetails;
+import ca.ualberta.huco.goqueer_android.server.response_type.UODAToken;
 
 
 /**

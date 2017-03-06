@@ -3,11 +3,11 @@ package ca.ualberta.huco.goqueer_android.network;
 import android.content.Context;
 import ca.ualberta.huco.goqueer_android.config.PropertiesReader;
 import ca.ualberta.huco.goqueer_android.storage.StorageManager;
-import ca.ualberta.huco.goqueer_android.uoda.UODAClient;
-import ca.ualberta.huco.goqueer_android.uoda.UODAConfiguration;
-import ca.ualberta.huco.goqueer_android.uoda.call_objects.BoolCallback;
-import ca.ualberta.huco.goqueer_android.uoda.call_objects.CallDelegate;
-import ca.ualberta.huco.goqueer_android.uoda.call_objects.CallPauseQueue;
+import ca.ualberta.huco.goqueer_android.server.UODAClient;
+import ca.ualberta.huco.goqueer_android.server.UODAConfiguration;
+import ca.ualberta.huco.goqueer_android.server.call_objects.BoolCallback;
+import ca.ualberta.huco.goqueer_android.server.call_objects.CallDelegate;
+import ca.ualberta.huco.goqueer_android.server.call_objects.CallPauseQueue;
 
 
 /**
