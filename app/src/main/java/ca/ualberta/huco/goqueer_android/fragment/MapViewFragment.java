@@ -1,4 +1,4 @@
-package ca.ualberta.huco.goqueer_android.activity;
+package ca.ualberta.huco.goqueer_android.fragment;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -27,7 +27,7 @@ public class MapViewFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.activity_main, container, false);
+        View rootView = inflater.inflate(R.layout.activity_map, container, false);
 
 //        mMapView = (MapView) rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);

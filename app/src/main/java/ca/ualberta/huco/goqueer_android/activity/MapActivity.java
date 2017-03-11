@@ -22,7 +22,11 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import ca.ualberta.huco.goqueer_android.R;
@@ -36,7 +40,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_map);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -50,9 +54,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-//                .findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(this);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
     }
 
@@ -61,10 +65,45 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney, Australia, and move the camera.
-        LatLng sydney = new LatLng(53.550247, -113.498094);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Welcome to Edmonton"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng testLocation =  new LatLng(53.550247, -113.498094);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(testLocation, 13));
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(testLocation)      // Sets the center of the map to location user
+                .zoom(14)                   // Sets the zoom
+                .bearing(0)                // Sets the orientation of the camera to east
+                .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                .build();                   // Creates a CameraPosition from the builder
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+
+        mMap.addMarker(new MarkerOptions()
+                .position(testLocation)
+                .title("Edmonton")
+                .snippet("Population: 4,137,400")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin3)));
+
+
+
+        LatLng testLocation1 =  new LatLng(53.561247, -113.478094);
+       mMap.addMarker(new MarkerOptions()
+                .position(testLocation1)
+                .title("Edmonton")
+                .snippet("Population: 4,137,400")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin2)));
+
+
+        LatLng testLocation2 =  new LatLng(53.571247, -113.468094);
+        mMap.addMarker(new MarkerOptions()
+                .position(testLocation2)
+                .title("Edmonton")
+                .snippet("Population: 4,137,400")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin4)));
+
+
+//        LatLng sydney = new LatLng(53.550247, -113.498094);
+//        mMap.addMarker(new MarkerOptions().position(sydney).title("Welcome to Edmonton"));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(testLocation));
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         else prepareLocationManager();
