@@ -120,12 +120,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .snippet("Population: 4,137,400")
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin6)));
 
-        PolylineOptions rectOptions = new PolylineOptions()
-                .add(new LatLng(53.57, -113.47))
-                .add(new LatLng(53.58, -113.48))  // North of the previous point, but at the same longitude
-                .add(new LatLng(53.59, -113.49))  // Same latitude, and 30km to the west
-                .add(new LatLng(53.58, -113.50))  // Same longitude, and 16km to the south
-                .add(new LatLng(53.57, -113.47)); // Closes the polyline.
+
         ArrayList test = new ArrayList();
         test.add(new LatLng(53.67, -113.57));
         test.add(new LatLng(53.687, -113.58));
@@ -134,16 +129,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         test.add(new LatLng(53.70, -113.60));
 
         mMap.addPolygon(new PolygonOptions()
-                .add(new LatLng(0, 0), new LatLng(0, 5), new LatLng(3, 5), new LatLng(3, 0), new LatLng(0, 0))
-                .addHole(test)
-                .fillColor(Color.BLUE));
+                .add(new LatLng(53.57, -113.47),
+                        new LatLng(53.58, -113.48),
+                        new LatLng(53.59, -113.49),
+                        new LatLng(53.58, -113.50),
+                        new LatLng(53.57, -113.47))
+                .fillColor(Color.GREEN));
 
-// Get back the mutable Polyline
-        Polyline polyline = mMap.addPolyline(rectOptions);
-
-//        LatLng sydney = new LatLng(53.550247, -113.498094);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Welcome to Edmonton"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(testLocation));
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         else prepareLocationManager();
