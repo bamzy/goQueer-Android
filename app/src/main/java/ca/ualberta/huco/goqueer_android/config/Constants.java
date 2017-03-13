@@ -13,8 +13,9 @@ public class Constants {
 
     public static final String PROPERTIES_FILE_NAME = "myualberta.properties";
     public static final String PREFERENCES_NAME = "MyUalbertaPrefs";
-    public static final String LOG_TAG = "MyUalberta";
-    public static final String OAUTH_LOGIN_SERVER_URL = "oauthLoginServerUrl";
+    public static final String LOG_TAG = "goqueer";
+    public static final String GO_QUEER_BASE_SERVER_URL = "http://129.128.99.115:8000";
+    public static final String OAUTH_LOGIN_SERVER_URL = "oauthTokenServerUrl";
     public static final String OAUTH_TOKEN_SERVER_URL = "oauthTokenServerUrl";
     public static final String OAUTH_TOKEN_LOGOUT_URL = "oauthTokenLogoutUrl";
     public static final String OAUTH_CHECK_SERVER_URL = "oauthCheckServerUrl";

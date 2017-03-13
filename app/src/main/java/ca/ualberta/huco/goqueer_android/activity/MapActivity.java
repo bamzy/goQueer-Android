@@ -5,6 +5,7 @@ package ca.ualberta.huco.goqueer_android.activity;
  */
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -16,8 +17,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -26,6 +31,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -34,13 +41,18 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import ca.ualberta.huco.goqueer_android.R;
 import ca.ualberta.huco.goqueer_android.location.MyLocation;
+import ca.ualberta.huco.goqueer_android.network.QueerClient;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,NavigationView.OnNavigationItemSelectedListener {
 
     private GoogleMap mMap;
+    private TextView coordinate;
+    private QueerClient queerClient;
 
 
     @Override
@@ -48,6 +60,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        coordinate = (TextView) findViewById(R.id.coordinates);
         setSupportActionBar(toolbar);
 
 
@@ -63,7 +76,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        queerClient = new QueerClient(getApplicationContext());
 
+
+    }
+    @Override
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+        return super.onCreateView(parent, name, context, attrs);
     }
 
 
@@ -136,11 +155,40 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         new LatLng(53.57, -113.47))
                 .fillColor(Color.GREEN));
 
+
+
+        CircleOptions circleOptions = new CircleOptions()
+                .center(new LatLng(53.44, -113.30))
+                .radius(1000); // In meters
+        mMap.addCircle(circleOptions);
+
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         else prepareLocationManager();
+        
+        prepareNetworkServices();
 
 
+
+
+
+    }
+
+    private void prepareNetworkServices() {
+        int delay = 5000; // delay for 5 sec.
+        int period = 10000; // repeat every 10 secs.
+
+        Timer timer = new Timer();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+
+            public void run() {
+                queerClient.getMyLocations();
+                System.out.println("repeating");
+
+            }
+
+        }, delay, period);
     }
 
 
@@ -148,9 +196,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         MyLocation.LocationResult locationResult = new MyLocation.LocationResult(){
             @Override
             public void gotLocation(final Location location){
+
                 MapActivity.this.runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(getApplicationContext(), "(" + location.getLongitude()+ " , " + location.getLatitude() + ")", Toast.LENGTH_SHORT).show();
+                        String value = "(" + location.getLongitude() + " , " + location.getLatitude() + ")";
+                        coordinate.setText(value);
 
                     }
                 });
