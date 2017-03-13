@@ -6,13 +6,17 @@ import java.util.ArrayList;
  * Created by Circa Lab on 3/12/2017.
  */
 
-public class QueerCoordinate {
-    private enum CoordinateType  {POLYGON, POINT}
+public class QCoordinate {
+    public enum CoordinateType  {POLYGON, POINT}
     private CoordinateType type;
     private ArrayList<Coordinate> coordinates = new ArrayList();
     private String coordinatesAsStr;
 
-    public QueerCoordinate(String coordinate) {
+    public ArrayList<Coordinate> getCoordinates() {
+        return coordinates;
+    }
+
+    public QCoordinate(String coordinate) {
         String typeString = "\"type\":";
         int index = coordinate.lastIndexOf(typeString);
         String tempType = coordinate.substring(index+typeString.length());

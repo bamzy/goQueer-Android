@@ -21,24 +21,19 @@ import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.android.volley.VolleyError;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -47,10 +42,16 @@ import java.util.TimerTask;
 import ca.ualberta.huco.goqueer_android.R;
 import ca.ualberta.huco.goqueer_android.location.MyLocation;
 import ca.ualberta.huco.goqueer_android.network.QueerClient;
+import ca.ualberta.huco.goqueer_android.network.VolleyMyCoordinatesCallback;
+import entity.Coordinate;
+import entity.QLocation;
+import entity.QCoordinate;
+
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,NavigationView.OnNavigationItemSelectedListener {
 
     private GoogleMap mMap;
+    private QLocation[] qLocations;
     private TextView coordinate;
     private QueerClient queerClient;
 
@@ -101,66 +102,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .build();                   // Creates a CameraPosition from the builder
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-
-        mMap.addMarker(new MarkerOptions()
-                .position(testLocation)
-                .title("Edmonton")
-                .snippet("Population: 4,137,400")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin3)));
-
-
-
-        LatLng testLocation1 =  new LatLng(53.561247, -113.478094);
-       mMap.addMarker(new MarkerOptions()
-                .position(testLocation1)
-                .title("Edmonton")
-                .snippet("Population: 4,137,400")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin2)));
-
-
-        LatLng testLocation2 =  new LatLng(53.571247, -113.468094);
-        mMap.addMarker(new MarkerOptions()
-                .position(testLocation2)
-                .title("Edmonton")
-                .snippet("Population: 4,137,400")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin4)));
-
-        LatLng testLocation3 =  new LatLng(53.581247, -113.458094);
-        mMap.addMarker(new MarkerOptions()
-                .position(testLocation3)
-                .title("Edmonton")
-                .snippet("Population: 4,137,400")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin5)));
-
-        LatLng testLocation4 =  new LatLng(53.591247, -113.448094);
-        mMap.addMarker(new MarkerOptions()
-                .position(testLocation4)
-                .title("Edmonton")
-                .snippet("Population: 4,137,400")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin6)));
-
-
-        ArrayList test = new ArrayList();
-        test.add(new LatLng(53.67, -113.57));
-        test.add(new LatLng(53.687, -113.58));
-
-        test.add(new LatLng(53.697, -113.59));
-        test.add(new LatLng(53.70, -113.60));
-
-        mMap.addPolygon(new PolygonOptions()
-                .add(new LatLng(53.57, -113.47),
-                        new LatLng(53.58, -113.48),
-                        new LatLng(53.59, -113.49),
-                        new LatLng(53.58, -113.50),
-                        new LatLng(53.57, -113.47))
-                .fillColor(Color.GREEN));
-
-
-
-        CircleOptions circleOptions = new CircleOptions()
-                .center(new LatLng(53.44, -113.30))
-                .radius(1000); // In meters
-        mMap.addCircle(circleOptions);
+//        CircleOptions circleOptions = new CircleOptions()
+//                .center(new LatLng(53.44, -113.30))
+//                .radius(1000); // In meters
+//        mMap.addCircle(circleOptions);
 
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
@@ -175,16 +120,48 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void prepareNetworkServices() {
-        int delay = 5000; // delay for 5 sec.
-        int period = 10000; // repeat every 10 secs.
+        int delay = 2000; // delay for 5 sec.
+        int period = 30000; // repeat every 10 secs.
 
         Timer timer = new Timer();
 
         timer.scheduleAtFixedRate(new TimerTask() {
 
             public void run() {
-                queerClient.getMyLocations();
-                System.out.println("repeating");
+                queerClient.getMyLocations(new VolleyMyCoordinatesCallback() {
+                    @Override
+                    public void onSuccess(QLocation[] queerLocations) {
+                        if (qLocations == null || qLocations.length == 0)
+                            qLocations = queerLocations;
+
+                        PolygonOptions polygonOptions = new PolygonOptions();
+                        for (QLocation queerLocation : qLocations) {
+                            if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POINT) {
+                                Coordinate latlog = queerLocation.getQCoordinates().getCoordinates().get(0);
+                                LatLng testLocation4 =  new LatLng(latlog.getLat(), latlog.getLon());
+                                mMap.addMarker(new MarkerOptions()
+                                        .position(testLocation4)
+                                        .title(queerLocation.getName())
+                                        .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin5)));
+                            } else if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POLYGON){
+                                for (Coordinate coordinate1 : queerLocation.getQCoordinates().getCoordinates()) {
+                                    polygonOptions.add(new LatLng(coordinate1.getLat(),coordinate1.getLon()));
+                                }
+                                mMap.addPolygon(polygonOptions.fillColor(Color.GREEN));
+
+                            }
+                        }
+
+                        System.out.println("repeated");
+                    }
+
+                    @Override
+                    public void onError(VolleyError result) {
+
+                    }
+                });
+
 
             }
 

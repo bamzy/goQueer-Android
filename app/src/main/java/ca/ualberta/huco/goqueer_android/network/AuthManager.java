@@ -127,7 +127,7 @@ public class AuthManager implements CallDelegate {
 //        uodaClient = null;
 //
 //        UODAAuthClient authClient = new UODAAuthClient(uodaConfiguration, queueManager);
-//        authClient.getGuestCredentials(new VolleySingleCallback() {
+//        authClient.getGuestCredentials(new VolleyMyCoordinatesCallback() {
 //
 //            @Override
 //            public void onSuccess(DataObject dataObject) {
@@ -227,7 +227,7 @@ public class AuthManager implements CallDelegate {
 //     */
 //    private void getTokenFromOAUTH(final String authCode, final UObjectCallback callback) {
 //        UODAAuthClient authClient = new UODAAuthClient(uodaConfiguration, queueManager);
-//        authClient.getTokenFromOAUTH(authCode, new VolleySingleCallback() {
+//        authClient.getTokenFromOAUTH(authCode, new VolleyMyCoordinatesCallback() {
 //            @Override
 //            public void onSuccess(DataObject dataObject) {
 //                UODAToken token = (UODAToken) dataObject;
@@ -260,7 +260,7 @@ public class AuthManager implements CallDelegate {
 //
 //        UODAAuthClient authClient = new UODAAuthClient(uodaConfiguration, queueManager);
 //
-//        authClient.checkAccessToken(storageManager.loadCredentials().getAccessToken(), new VolleySingleCallback() {
+//        authClient.checkAccessToken(storageManager.loadCredentials().getAccessToken(), new VolleyMyCoordinatesCallback() {
 //            @Override
 //            public void onSuccess(DataObject result) {
 //                UODACheck uodaCheck = (UODACheck) result;
@@ -315,7 +315,7 @@ public class AuthManager implements CallDelegate {
 //
 //        UODAAuthClient authClient = new UODAAuthClient(uodaConfiguration, queueManager);
 //
-//        authClient.refreshAccessToken(refreshToken, new VolleySingleCallback() {
+//        authClient.refreshAccessToken(refreshToken, new VolleyMyCoordinatesCallback() {
 //            @Override
 //            public void onSuccess(DataObject result) {
 //                UODAToken uodaToken = (UODAToken) result;
@@ -336,7 +336,7 @@ public class AuthManager implements CallDelegate {
 //    private void logoutToken() {
 //        UODAAuthClient authClient = new UODAAuthClient(uodaConfiguration, queueManager);
 //
-//        authClient.logoutAuthorizationToken(new VolleySingleCallback() {
+//        authClient.logoutAuthorizationToken(new VolleyMyCoordinatesCallback() {
 //            @Override
 //            public void onSuccess(DataObject dataObject) {
 //                Log.i(Constants.LOG_TAG, "Successfully logged out token.");

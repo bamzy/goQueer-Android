@@ -186,7 +186,7 @@ public class DataProvider {
 //        }
 //    }
 //
-//    public static class Location {
+//    public static class QLocation {
 //        public static void room(long roomId, final UObjectCallback callback) {
 //            if (roomId == 0) {
 //                Log.e(Constants.LOG_TAG, "Blocked call to get room with id 0.");

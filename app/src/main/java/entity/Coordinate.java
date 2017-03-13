@@ -16,8 +16,8 @@ public class Coordinate {
         if (input != null ) {
             coords = input.split(",");
             if (coords.length == 2) {
-                lat = Double.parseDouble(coords[0]);
-                lon = Double.parseDouble(coords[1]);
+                lon = Double.parseDouble(coords[0]);
+                lat = Double.parseDouble(coords[1]);
             } else {
                 lat = 0;
                 lon = 0;

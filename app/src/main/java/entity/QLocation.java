@@ -4,7 +4,15 @@ package entity;
  * Created by Circa Lab on 3/12/2017.
  */
 
-public class Location {
+public class QLocation {
+    private long id;
+    private String created_at;
+    private String updated_at;
+    private String coordinate;
+    private String name;
+    private String description;
+    private String address;
+    private QCoordinate coordinates;
     public long getId() {
         return id;
     }
@@ -32,14 +40,14 @@ public class Location {
     public String getAddress() {
         return address;
     }
+    public void setCoordinates(QCoordinate qCoordinate){
+        coordinates = qCoordinate;
+    }
+    public QCoordinate getQCoordinates(){
+        return coordinates;
+    }
 
-        long id;
-        String created_at;
-        String updated_at;
-        String coordinate;
-        String name;
-        String description;
-        String address;
+
 
 
 }

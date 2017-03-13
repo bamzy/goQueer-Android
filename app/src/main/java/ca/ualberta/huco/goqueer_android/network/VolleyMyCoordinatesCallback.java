@@ -2,15 +2,15 @@ package ca.ualberta.huco.goqueer_android.network;
 
 import com.android.volley.VolleyError;
 
-import ca.ualberta.huco.goqueer_android.server.response_type.DataObject;
+import entity.QLocation;
 
 
 /**
  * Created by bamdad on 7/21/2016.
  */
-public interface VolleySingleCallback {
+public interface VolleyMyCoordinatesCallback {
 
-    void onSuccess(DataObject dataObject);
+    void onSuccess(QLocation[] queerQLocations);
     void onError(VolleyError result);
 }
 

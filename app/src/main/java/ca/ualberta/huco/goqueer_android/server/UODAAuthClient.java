@@ -15,8 +15,8 @@ import com.google.gson.JsonParser;
 import java.util.Map;
 
 import ca.ualberta.huco.goqueer_android.config.Constants;
+import ca.ualberta.huco.goqueer_android.network.VolleyMyCoordinatesCallback;
 import ca.ualberta.huco.goqueer_android.network.VolleyQueueManager;
-import ca.ualberta.huco.goqueer_android.network.VolleySingleCallback;
 import ca.ualberta.huco.goqueer_android.server.response_type.UODACheck;
 import ca.ualberta.huco.goqueer_android.server.response_type.UODAToken;
 
@@ -34,20 +34,20 @@ public class UODAAuthClient {
         this.queueManager = volleyQueueManager;
     }
 
-    public void refreshAccessToken(final String refreshToken, final VolleySingleCallback volleySingleCallback) {
+    public void refreshAccessToken(final String refreshToken, final VolleyMyCoordinatesCallback volleyMyCoordinatesCallback) {
         StringRequest refreshTokenRequest = new StringRequest(Request.Method.POST, uodaConfiguration.getRefreshTokenBaseUrl(),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         UODAToken uodaToken = extractCredentials(response);
-                        volleySingleCallback.onSuccess(uodaToken);
+//                        volleyMyCoordinatesCallback.onSuccess(uodaToken);
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(Constants.LOG_TAG, "Volley Error: " + new String(error.networkResponse.data));
-                        volleySingleCallback.onError(error);
+                        volleyMyCoordinatesCallback.onError(error);
 
                     }
                 }) {
@@ -67,19 +67,19 @@ public class UODAAuthClient {
         queueManager.addToRequestQueue(refreshTokenRequest);
     }
 
-    public void checkAccessToken(final String accessToken, final VolleySingleCallback volleySingleCallback) {
+    public void checkAccessToken(final String accessToken, final VolleyMyCoordinatesCallback volleyMyCoordinatesCallback) {
         StringRequest checkTokenRequest = new StringRequest(Request.Method.GET, uodaConfiguration.getCheckTokenBaseUrl(),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         UODACheck uodaCheck = new UODACheck(response);
-                        volleySingleCallback.onSuccess(uodaCheck);
+//                        volleyMyCoordinatesCallback.onSuccess(uodaCheck);
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        volleySingleCallback.onError(error);
+                        volleyMyCoordinatesCallback.onError(error);
 
                     }
                 }) {
@@ -98,19 +98,19 @@ public class UODAAuthClient {
         queueManager.addToRequestQueue(checkTokenRequest);
     }
 
-    public void getTokenFromOAUTH(final String firstStepCode, final VolleySingleCallback volleySingleCallback) {
+    public void getTokenFromOAUTH(final String firstStepCode, final VolleyMyCoordinatesCallback volleyMyCoordinatesCallback) {
         StringRequest loginPostRequest = new StringRequest(Request.Method.POST, uodaConfiguration.getLoginPostUrl(firstStepCode),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         UODAToken uodaToken = extractCredentials(response);
-                        volleySingleCallback.onSuccess(uodaToken);
+//                        volleyMyCoordinatesCallback.onSuccess(uodaToken);
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        volleySingleCallback.onError(error);
+                        volleyMyCoordinatesCallback.onError(error);
 
                     }
                 }) {
@@ -135,20 +135,20 @@ public class UODAAuthClient {
         queueManager.addToRequestQueue(loginPostRequest);
     }
 
-    public void getGuestCredentials(final VolleySingleCallback volleySingleCallback) {
+    public void getGuestCredentials(final VolleyMyCoordinatesCallback volleyMyCoordinatesCallback) {
         StringRequest loginGetCredentials = new StringRequest(Request.Method.POST, uodaConfiguration.getLoginGuestURL(),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         UODAToken uodaToken = extractCredentials(response, Constants.GUEST_ID);
 
-                        volleySingleCallback.onSuccess(uodaToken);
+//                        volleyMyCoordinatesCallback.onSuccess(uodaToken);
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        volleySingleCallback.onError(error);
+                        volleyMyCoordinatesCallback.onError(error);
 
                     }
                 })
@@ -175,7 +175,7 @@ public class UODAAuthClient {
         queueManager.addToRequestQueue(loginGetCredentials);
     }
 
-    public void logoutAuthorizationToken(final VolleySingleCallback callback) {
+    public void logoutAuthorizationToken(final VolleyMyCoordinatesCallback callback) {
         String baseURL = uodaConfiguration.getLogoutTokenUrl();
 
         StringRequest loginGetCredentials = new StringRequest(Request.Method.GET, baseURL,
