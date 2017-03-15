@@ -6,6 +6,7 @@ package ca.ualberta.huco.goqueer_android.activity;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -15,13 +16,16 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,16 +34,20 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.vision.text.Element;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import ca.ualberta.huco.goqueer_android.R;
+import ca.ualberta.huco.goqueer_android.config.Constants;
 import ca.ualberta.huco.goqueer_android.location.MyLocation;
 import ca.ualberta.huco.goqueer_android.network.QueerClient;
 import ca.ualberta.huco.goqueer_android.network.VolleyMyCoordinatesCallback;
@@ -51,11 +59,19 @@ import entity.QCoordinate;
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,NavigationView.OnNavigationItemSelectedListener {
 
     private GoogleMap mMap;
-    private QLocation[] qLocations;
+    private QLocation[] discoveredLocations;
+    private ArrayList<QLocation> allLocations;
     private TextView coordinate;
     private QueerClient queerClient;
-
-
+    private int mStyleIds[] = {
+            R.string.style_label_retro,
+            R.string.style_label_night,
+            R.string.style_label_grayscale,
+            R.string.style_label_no_pois_no_transit,
+            R.string.style_label_default,
+    };
+    private static final String SELECTED_STYLE = "selected_style";
+    private int mSelectedStyleId = R.string.style_label_default;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,6 +103,85 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
+    private void showStylesDialog() {
+        // mStyleIds stores each style's resource ID, and we extract the names here, rather
+        // than using an XML array resource which AlertDialog.Builder.setItems() can also
+        // accept. We do this since using an array resource would mean we would not have
+        // constant values we can switch/case on, when choosing which style to apply.
+        List<String> styleNames = new ArrayList<>();
+        for (int style : mStyleIds) {
+            styleNames.add(getString(style));
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.style_choose));
+        builder.setItems(styleNames.toArray(new CharSequence[styleNames.size()]),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mSelectedStyleId = mStyleIds[which];
+                        String msg = getString(R.string.style_set_to, getString(mSelectedStyleId));
+                        Toast.makeText(getBaseContext(), msg, Toast.LENGTH_SHORT).show();
+                        Log.d(Constants.LOG_TAG, msg);
+                        setSelectedStyle();
+                    }
+                });
+        builder.show();
+    }
+
+    private void setSelectedStyle() {
+        MapStyleOptions style;
+        switch (mSelectedStyleId) {
+            case R.string.style_label_retro:
+                // Sets the retro style via raw resource JSON.
+                style = MapStyleOptions.loadRawResourceStyle(this, R.raw.mapstyle_retro);
+                break;
+            case R.string.style_label_night:
+                // Sets the night style via raw resource JSON.
+                style = MapStyleOptions.loadRawResourceStyle(this, R.raw.mapstyle_night);
+                break;
+            case R.string.style_label_grayscale:
+                // Sets the grayscale style via raw resource JSON.
+                style = MapStyleOptions.loadRawResourceStyle(this, R.raw.mapstyle_grayscale);
+                break;
+            case R.string.style_label_no_pois_no_transit:
+                // Sets the no POIs or transit style via JSON string.
+                style = new MapStyleOptions("[" +
+                        "  {" +
+                        "    \"featureType\":\"poi.business\"," +
+                        "    \"elementType\":\"all\"," +
+                        "    \"stylers\":[" +
+                        "      {" +
+                        "        \"visibility\":\"off\"" +
+                        "      }" +
+                        "    ]" +
+                        "  }," +
+                        "  {" +
+                        "    \"featureType\":\"transit\"," +
+                        "    \"elementType\":\"all\"," +
+                        "    \"stylers\":[" +
+                        "      {" +
+                        "        \"visibility\":\"off\"" +
+                        "      }" +
+                        "    ]" +
+                        "  }" +
+                        "]");
+                break;
+            case R.string.style_label_default:
+                // Removes previously set style, by setting it to null.
+                style = null;
+                break;
+            default:
+                return;
+        }
+        mMap.setMapStyle(style);
+    }
+
+
+
+
+
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -111,17 +206,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         else prepareLocationManager();
         
-        prepareNetworkServices();
+        initiateMyLocationPolling();
 
-
-
-
+        MapStyleOptions style;
+        style = MapStyleOptions.loadRawResourceStyle(this, R.raw.mapstyle_grayscale);
+        mMap.setMapStyle(style);
 
     }
 
-    private void prepareNetworkServices() {
+    private void initiateMyLocationPolling() {
         int delay = 2000; // delay for 5 sec.
-        int period = 30000; // repeat every 10 secs.
+        int period = 15000; // repeat every 10 secs.
 
         Timer timer = new Timer();
 
@@ -131,11 +226,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 queerClient.getMyLocations(new VolleyMyCoordinatesCallback() {
                     @Override
                     public void onSuccess(QLocation[] queerLocations) {
-                        if (qLocations == null || qLocations.length == 0)
-                            qLocations = queerLocations;
+                        mMap.clear();
 
-                        PolygonOptions polygonOptions = new PolygonOptions();
-                        for (QLocation queerLocation : qLocations) {
+//                        if (discoveredLocations == null || discoveredLocations.length == 0)
+                        discoveredLocations = queerLocations;
+
+                        for (QLocation queerLocation : discoveredLocations) {
                             if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POINT) {
                                 Coordinate latlog = queerLocation.getQCoordinates().getCoordinates().get(0);
                                 LatLng testLocation4 =  new LatLng(latlog.getLat(), latlog.getLon());
@@ -145,15 +241,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                         .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin5)));
                             } else if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POLYGON){
+                                PolygonOptions polygonOptions = new PolygonOptions();
                                 for (Coordinate coordinate1 : queerLocation.getQCoordinates().getCoordinates()) {
                                     polygonOptions.add(new LatLng(coordinate1.getLat(),coordinate1.getLon()));
                                 }
                                 mMap.addPolygon(polygonOptions.fillColor(Color.GREEN));
-
                             }
                         }
 
-                        System.out.println("repeated");
+                        Log.w(Constants.LOG_TAG,"Getting My Location Repeated");
+                        pullAllLocations();
                     }
 
                     @Override
@@ -166,6 +263,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
 
         }, delay, period);
+    }
+
+    private void pullAllLocations() {
+        queerClient.getAllLocations(new VolleyMyCoordinatesCallback() {
+            @Override
+            public void onSuccess(QLocation[] queerLocations) {
+                if (allLocations != null   )
+                    allLocations.clear();
+                allLocations=new ArrayList<QLocation>(Arrays.asList(queerLocations));
+                Log.w(Constants.LOG_TAG,"Getting All Location Repeated" + allLocations.size());
+
+            }
+
+            @Override
+            public void onError(VolleyError result) {
+
+            }
+        });
     }
 
 
@@ -232,7 +347,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
+        if (item.getItemId() == R.id.menu_style_choose) {
+            showStylesDialog();
+            return true;
+        }
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
@@ -264,6 +382,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // Store the selected map style, so we can assign it when the activity resumes.
+        outState.putInt(SELECTED_STYLE, mSelectedStyleId);
+        super.onSaveInstanceState(outState);
     }
 
 
