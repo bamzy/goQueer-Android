@@ -38,28 +38,34 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
-import com.google.android.gms.vision.text.Element;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import ca.ualberta.huco.goqueer_android.R;
 import ca.ualberta.huco.goqueer_android.config.Constants;
 import ca.ualberta.huco.goqueer_android.location.MyLocation;
 import ca.ualberta.huco.goqueer_android.network.QueerClient;
 import ca.ualberta.huco.goqueer_android.network.VolleyMyCoordinatesCallback;
+import ca.ualberta.huco.goqueer_android.network.VolleyMyGalleriesCallback;
+import ca.ualberta.huco.goqueer_android.network.VolleyMyGalleryInfoCallback;
 import entity.Coordinate;
+import entity.QGallery;
 import entity.QLocation;
 import entity.QCoordinate;
+import entity.QMedia;
 
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,NavigationView.OnNavigationItemSelectedListener {
 
     private GoogleMap mMap;
     private QLocation[] discoveredLocations;
+    //private QGallery[] myGalleries;
+    private List<QGallery> myGalleries = new CopyOnWriteArrayList<QGallery>();
     private ArrayList<QLocation> allLocations;
     private TextView coordinate;
     private QueerClient queerClient;
@@ -205,14 +211,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         else prepareLocationManager();
+        if (android.os.Build.VERSION.SDK_INT < 23)
+            prepareLocationManager();
         
-        initiateMyLocationPolling();
 
         MapStyleOptions style;
         style = MapStyleOptions.loadRawResourceStyle(this, R.raw.mapstyle_grayscale);
         mMap.setMapStyle(style);
 
+        initiateMyLocationPolling();
+//        initiateGpsPolling();
+
     }
+
+
 
     private void initiateMyLocationPolling() {
         int delay = 2000; // delay for 5 sec.
@@ -229,6 +241,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         mMap.clear();
 
 //                        if (discoveredLocations == null || discoveredLocations.length == 0)
+                        discoveredLocations= null;
                         discoveredLocations = queerLocations;
 
                         for (QLocation queerLocation : discoveredLocations) {
@@ -250,6 +263,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         }
 
                         Log.w(Constants.LOG_TAG,"Getting My Location Repeated");
+                        pullMyGalleries(discoveredLocations);
                         pullAllLocations();
                     }
 
@@ -263,6 +277,52 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
 
         }, delay, period);
+    }
+
+    private void pullMyGalleries(final QLocation[] locations) {
+
+        for (QLocation location : locations) {
+            queerClient.getMyGalleryInfo(new VolleyMyGalleryInfoCallback() {
+                @Override
+                public void onSuccess(QGallery gallery) {
+                    if (gallery != null && !existIn(myGalleries,gallery)) {
+
+                        myGalleries.add(gallery);
+                        getGallery(gallery.getId());
+                    }
+                }
+                @Override
+                public void onError(VolleyError result) {
+
+                }
+            },location.getGallery_id());
+            getGallery(location.getGallery_id());
+        }
+    }
+
+    private boolean existIn(List<QGallery> myGalleries, QGallery gallery) {
+        for (QGallery myGallery : myGalleries) {
+            if (myGallery.getId()== gallery.getId())
+                return true;
+        }
+        return false;
+    }
+
+    private void getGallery(final long gallery_id) {
+        queerClient.getMyGallery(new VolleyMyGalleriesCallback() {
+            @Override
+            public void onSuccess(QMedia[] medias) {
+                for (QGallery myGallery : myGalleries) {
+                    if (myGallery.getId() == gallery_id)
+                        myGallery.setMedias(new ArrayList<>(Arrays.asList(medias)));
+                }
+
+            }
+            @Override
+            public void onError(VolleyError result) {
+
+            }
+        },gallery_id);
     }
 
     private void pullAllLocations() {

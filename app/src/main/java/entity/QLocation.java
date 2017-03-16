@@ -12,7 +12,7 @@ public class QLocation {
     private String name;
     private String description;
     private String address;
-    private String gallery_id;
+    private long gallery_id;
     private QCoordinate coordinates;
     public long getId() {
         return id;
@@ -48,7 +48,7 @@ public class QLocation {
         return coordinates;
     }
 
-
-
-
+    public long getGallery_id() {
+        return gallery_id;
+    }
 }

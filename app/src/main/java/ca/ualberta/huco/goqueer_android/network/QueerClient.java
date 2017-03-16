@@ -16,7 +16,9 @@ import java.util.ArrayList;
 
 import ca.ualberta.huco.goqueer_android.config.Constants;
 import entity.QCoordinate;
+import entity.QGallery;
 import entity.QLocation;
+import entity.QMedia;
 
 /**
  * Created by Circa Lab on 2/14/2017.
@@ -43,12 +45,9 @@ public class QueerClient {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-//                        Log.w(Constants.LOG_TAG,response);
                         Gson gson = new Gson();
-                        ArrayList<QCoordinate> qCoordinates = new ArrayList<>();
                         QLocation[] discoveredQLocations = gson.fromJson(response, QLocation[].class);
                         for (QLocation location : discoveredQLocations) {
-//                            Log.w(Constants.LOG_TAG,location.getCoordinate());
                             location.setCoordinates(new QCoordinate(location.getCoordinate()));
 
                         }
@@ -70,16 +69,63 @@ public class QueerClient {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-//                        Log.w(Constants.LOG_TAG,response);
                         Gson gson = new Gson();
-                        ArrayList<QCoordinate> qCoordinates = new ArrayList<>();
+
                         QLocation[] discoveredQLocations = gson.fromJson(response, QLocation[].class);
                         for (QLocation location : discoveredQLocations) {
-//                            Log.w(Constants.LOG_TAG,location.getCoordinate());
                             location.setCoordinates(new QCoordinate(location.getCoordinate()));
-
                         }
                         volleyMyCoordinatesCallback.onSuccess(discoveredQLocations);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.w(Constants.LOG_TAG,error.getCause());
+            }
+        });
+        queue.add(stringRequest);
+    }
+
+
+    public void getMyGallery(final VolleyMyGalleriesCallback volleyMyGalleriesCallback, long gallery_id){
+        String allLocationsUrl = url + "/client/getGalleryMediaById?gallery_id=" + gallery_id;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, allLocationsUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Gson gson = new Gson();
+
+                        QMedia[] myMedias = gson.fromJson(response, QMedia[].class);
+//                        for (QLocation location : discoveredQLocations) {
+//                            location.setCoordinates(new QCoordinate(location.getCoordinate()));
+//                        }
+                        volleyMyGalleriesCallback.onSuccess(myMedias);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.w(Constants.LOG_TAG,error.getCause());
+            }
+        });
+        queue.add(stringRequest);
+    }
+
+
+    public void getMyGalleryInfo(final VolleyMyGalleryInfoCallback volleyMyGalleryInfoCallback, long id){
+        String allLocationsUrl = url + "/client/getGalleryById?gallery_id=" + id;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, allLocationsUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Gson gson = new Gson();
+
+                        QGallery[] gallery = gson.fromJson(response, QGallery[].class);
+//                        for (QLocation location : discoveredQLocations) {
+//                            location.setCoordinates(new QCoordinate(location.getCoordinate()));
+//                        }
+                        if (gallery.length>0)
+                            volleyMyGalleryInfoCallback.onSuccess(gallery[0]);
+                        else volleyMyGalleryInfoCallback.onSuccess(null);
                     }
                 }, new Response.ErrorListener() {
             @Override

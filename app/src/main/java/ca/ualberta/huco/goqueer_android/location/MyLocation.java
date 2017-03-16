@@ -13,6 +13,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
+
+import ca.ualberta.huco.goqueer_android.config.Constants;
 
 public class MyLocation {
     Timer timer1;
@@ -50,7 +53,7 @@ public class MyLocation {
             return false;
 
         if (gps_enabled)
-                // TODO: Consider calling
+
                 //    ActivityCompat#requestPermissions
                 // here to request the missing permissions, and then overriding
                 //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
@@ -63,7 +66,7 @@ public class MyLocation {
         if (network_enabled)
             lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListenerNetwork);
         timer1 = new Timer();
-        timer1.scheduleAtFixedRate(new GetLastLocation(context), 2000, 15000);
+        timer1.scheduleAtFixedRate(new GetLastLocation(context), 10000L, 150000L);
         return true;
     }
 
@@ -113,7 +116,7 @@ public class MyLocation {
         public void run() {
             lm.removeUpdates(locationListenerGps);
             lm.removeUpdates(locationListenerNetwork);
-
+            Log.w(Constants.LOG_TAG,"run called");
             Location net_loc = null, gps_loc = null;
             if (gps_enabled)
                     gps_loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
