@@ -5,6 +5,7 @@ package ca.ualberta.huco.goqueer_android.activity;
  */
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -42,6 +43,7 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -49,6 +51,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import ca.ualberta.huco.goqueer_android.R;
 import ca.ualberta.huco.goqueer_android.config.Constants;
 import ca.ualberta.huco.goqueer_android.location.MyLocation;
+import ca.ualberta.huco.goqueer_android.network.DownloadMedia;
 import ca.ualberta.huco.goqueer_android.network.QueerClient;
 import ca.ualberta.huco.goqueer_android.network.VolleyMyCoordinatesCallback;
 import ca.ualberta.huco.goqueer_android.network.VolleyMyGalleriesCallback;
@@ -63,7 +66,9 @@ import entity.QMedia;
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,NavigationView.OnNavigationItemSelectedListener {
 
     private GoogleMap mMap;
+    private ProgressDialog downloadProgressDialog;
     private QLocation[] discoveredLocations;
+    private final DownloadMedia downloadMedia = new DownloadMedia(MapActivity.this);
     //private QGallery[] myGalleries;
     private List<QGallery> myGalleries = new CopyOnWriteArrayList<QGallery>();
     private ArrayList<QLocation> allLocations;
@@ -100,6 +105,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         queerClient = new QueerClient(getApplicationContext());
+
+        downloadProgressDialog = new ProgressDialog(MapActivity.this);
+        downloadProgressDialog.setMessage("Downloading");
+        downloadProgressDialog.setIndeterminate(true);
+        downloadProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        downloadProgressDialog.setCancelable(true);
 
 
     }
@@ -315,6 +326,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 for (QGallery myGallery : myGalleries) {
                     if (myGallery.getId() == gallery_id)
                         myGallery.setMedias(new ArrayList<>(Arrays.asList(medias)));
+                        downloadMediaContent(medias);
                 }
 
             }
@@ -323,6 +335,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             }
         },gallery_id);
+    }
+
+    private void downloadMediaContent(QMedia[] medias) {
+        downloadMedia.execute(Constants.GO_QUEER_BASE_SERVER_URL+"downloadMediaById?media_id=" +medias[0].getId());
+        downloadProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                downloadMedia.cancel(true);
+            }
+        });
     }
 
     private void pullAllLocations() {
