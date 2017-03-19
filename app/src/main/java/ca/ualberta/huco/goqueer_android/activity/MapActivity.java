@@ -8,6 +8,7 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -25,6 +26,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,13 +39,14 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -63,10 +66,10 @@ import entity.QCoordinate;
 import entity.QMedia;
 
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,NavigationView.OnNavigationItemSelectedListener {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,NavigationView.OnNavigationItemSelectedListener, GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap mMap;
-    private ProgressDialog downloadProgressDialog;
+    private ImageView galleryThumbnail;
     private QLocation[] discoveredLocations;
     private final DownloadMedia downloadMedia = new DownloadMedia(MapActivity.this);
     //private QGallery[] myGalleries;
@@ -105,12 +108,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         queerClient = new QueerClient(getApplicationContext());
+        galleryThumbnail = (ImageView) findViewById(R.id.galleryThumbnail);
 
-        downloadProgressDialog = new ProgressDialog(MapActivity.this);
-        downloadProgressDialog.setMessage("Downloading");
-        downloadProgressDialog.setIndeterminate(true);
-        downloadProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        downloadProgressDialog.setCancelable(true);
+
 
 
     }
@@ -214,11 +214,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .build();                   // Creates a CameraPosition from the builder
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-//        CircleOptions circleOptions = new CircleOptions()
-//                .center(new LatLng(53.44, -113.30))
-//                .radius(1000); // In meters
-//        mMap.addCircle(circleOptions);
-
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         else prepareLocationManager();
@@ -229,9 +224,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         MapStyleOptions style;
         style = MapStyleOptions.loadRawResourceStyle(this, R.raw.mapstyle_grayscale);
         mMap.setMapStyle(style);
-
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.setOnInfoWindowClickListener(this);
         initiateMyLocationPolling();
-//        initiateGpsPolling();
 
     }
 
@@ -326,7 +321,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 for (QGallery myGallery : myGalleries) {
                     if (myGallery.getId() == gallery_id)
                         myGallery.setMedias(new ArrayList<>(Arrays.asList(medias)));
-                        downloadMediaContent(medias);
+//                        downloadMediaContent(medias);
                 }
 
             }
@@ -337,15 +332,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         },gallery_id);
     }
 
-    private void downloadMediaContent(QMedia[] medias) {
-        downloadMedia.execute(Constants.GO_QUEER_BASE_SERVER_URL+"downloadMediaById?media_id=" +medias[0].getId());
-        downloadProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                downloadMedia.cancel(true);
-            }
-        });
-    }
 
     private void pullAllLocations() {
         queerClient.getAllLocations(new VolleyMyCoordinatesCallback() {
@@ -450,6 +436,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (id == R.id.nav_set) {
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
+            navigateToGalleryActivity();
+
 
         } else if (id == R.id.nav_slideshow) {
 
@@ -474,4 +462,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
+    private void navigateToGalleryActivity() {
+        Intent map = new Intent(MapActivity.this, GalleryActivity.class);
+        startActivity(map);
+        finish();
+    }
+
+
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=2").into(galleryThumbnail);
+        galleryThumbnail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToGalleryActivity();
+            }
+        });
+
+    }
 }
