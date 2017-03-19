@@ -1,51 +1,64 @@
 package ca.ualberta.huco.goqueer_android.activity;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Gallery;
-import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 
 import com.squareup.picasso.Picasso;
 
-import java.io.InputStream;
-import java.net.URL;
 
 import ca.ualberta.huco.goqueer_android.R;
-import ca.ualberta.huco.goqueer_android.adapter.GridViewAdapter;
 import ca.ualberta.huco.goqueer_android.config.Constants;
+import entity.QGallery;
 
 /**
  * Created by Circa Lab on 3/18/2017.
  */
 
 public class GalleryActivity extends AppCompatActivity {
-   private ImageView mainMediaImage;
-
+    private ImageView mainMediaImage;
+    public static QGallery gallery;
+    private int currentIndex;
+    private TextView mediaTitle, mediaDescription;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gallery_main);
         mainMediaImage = (ImageView) findViewById(R.id.mainMediaImage);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.next);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mediaTitle = (TextView) findViewById(R.id.mediaTitle);
+        mediaDescription = (TextView) findViewById(R.id.mediaDescription);
+        currentIndex = 0;
+        setMediaContent(gallery.getMedias().get(currentIndex).getId());
+
+        FloatingActionButton fabn = (FloatingActionButton) findViewById(R.id.next);
+        fabn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id="+"3").into(mainMediaImage);
+                if (currentIndex<gallery.getMedias().size()-1) {
+                    currentIndex++;
+                    setMediaContent(currentIndex);
+                }
+            }
+        });
+
+
+        FloatingActionButton fabp = (FloatingActionButton) findViewById(R.id.previous);
+        fabp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentIndex>0) {
+                    currentIndex--;
+                    setMediaContent(currentIndex);
+                }
             }
         });
     }
@@ -53,7 +66,16 @@ public class GalleryActivity extends AppCompatActivity {
     @Override
     public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
         View view = super.onCreateView(parent, name, context, attrs);
-//        Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id="+"4").into(mainMediaImage);
         return view;
+    }
+
+    public void setMediaContent(long mediaIndex) {
+        if (mediaIndex < gallery.getMedias().size() && mediaIndex>=0){
+            mediaTitle.setText(gallery.getMedias().get(currentIndex).getName());
+            mediaDescription.setText(gallery.getMedias().get(currentIndex).getDescription());
+            Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id="+ gallery.getMedias().get(currentIndex).getId()).into(mainMediaImage);
+        }
+
+
     }
 }

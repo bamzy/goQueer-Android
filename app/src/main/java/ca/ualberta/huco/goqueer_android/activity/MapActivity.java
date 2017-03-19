@@ -5,7 +5,6 @@ package ca.ualberta.huco.goqueer_android.activity;
  */
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -44,6 +43,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.squareup.picasso.Picasso;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -436,7 +436,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (id == R.id.nav_set) {
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
-            navigateToGalleryActivity();
+
 
 
         } else if (id == R.id.nav_slideshow) {
@@ -462,7 +462,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
-    private void navigateToGalleryActivity() {
+    private void navigateToGalleryActivity(QGallery qGallery) {
+        GalleryActivity.gallery = qGallery;
         Intent map = new Intent(MapActivity.this, GalleryActivity.class);
         startActivity(map);
         finish();
@@ -472,13 +473,35 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=2").into(galleryThumbnail);
+        if(marker.isInfoWindowShown()) {
+            marker.hideInfoWindow();
+        } else {
+            marker.showInfoWindow();
+        }
+        final QGallery qGallery = findAssociatedGallery(marker);
+        if (qGallery != null && qGallery.getMedias().size()>0)
+            Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + qGallery.getMedias().get(0).getId()).into(galleryThumbnail);
         galleryThumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                navigateToGalleryActivity();
+                navigateToGalleryActivity(qGallery);
             }
         });
+
+    }
+
+    private QGallery findAssociatedGallery(Marker marker) {
+        for (QLocation discoveredLocation : discoveredLocations) {
+            if (marker.getTitle().equals(discoveredLocation.getName())) {
+                for (QGallery myGallery : myGalleries) {
+                    if (discoveredLocation.getGallery_id() == myGallery.getId()){
+                        return myGallery;
+                    }
+
+                }
+            }
+        }
+        return null;
 
     }
 }
