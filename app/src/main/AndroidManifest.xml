@@ -40,6 +40,17 @@
             android:theme="@style/AppTheme.NoActionBar">
 
         </activity>
+        <service
+            android:name="ca.ualberta.huco.goqueer_android.activity.SrvPositioning"
+            android:enabled="true" />
+
+        <receiver android:name="ca.ualberta.huco.goqueer_android.activity.ReceiverPositioningAlarm" >
+
+            <!-- this Broadcast Receiver only listens to the following intent -->
+            <intent-filter>
+                <action android:name="org.mabna.order.ACTION_REFRESH_SCHEDULE_ALARM" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

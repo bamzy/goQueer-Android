@@ -29,6 +29,8 @@ public class QueerClient {
     private final RequestQueue queue;
     private Context context;
     private String device_id;
+    private long discoveryStatus;
+
     public QueerClient(Context context) {
         this.context = context;
         device_id = Settings.Secure.getString(context.getContentResolver(),
@@ -136,4 +138,21 @@ public class QueerClient {
         queue.add(stringRequest);
     }
 
+    public void setDiscoveryStatus(final VolleySetDiscoveryCallback volleySetDiscoveryCallback ,long discoveryStatus) {
+        String newurl = url + "/client/setDiscoveryStatus?location_id=" + discoveryStatus;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, newurl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        volleySetDiscoveryCallback.onSuccess(true);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.w(Constants.LOG_TAG,error.getCause());
+            }
+        });
+        queue.add(stringRequest);
+    }
 }
