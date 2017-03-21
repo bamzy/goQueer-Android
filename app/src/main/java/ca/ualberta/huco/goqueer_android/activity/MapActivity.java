@@ -55,6 +55,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.squareup.picasso.Picasso;
 
@@ -85,6 +86,7 @@ public class MapActivity extends AppCompatActivity implements
         OnMapReadyCallback,
         NavigationView.OnNavigationItemSelectedListener,
         GoogleMap.OnInfoWindowClickListener ,
+
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener,
@@ -107,9 +109,6 @@ public class MapActivity extends AppCompatActivity implements
             UPDATE_INTERVAL_IN_MILLISECONDS / 2;
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
     // Keys for storing activity state in the Bundle.
-    protected final static String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
-    protected final static String LOCATION_KEY = "location-key";
-    protected final static String LAST_UPDATED_TIME_STRING_KEY = "last-updated-time-string-key";
     protected final static String KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates";
     protected final static String KEY_LOCATION = "location";
     protected final static String KEY_LAST_UPDATED_TIME_STRING = "last-updated-time-string";
@@ -139,6 +138,9 @@ public class MapActivity extends AppCompatActivity implements
     private LocationManager locationManager;
     private List<QGallery> myGalleries = new CopyOnWriteArrayList<QGallery>();
     private ArrayList<QLocation> allLocations;
+    private ArrayList<Marker> discoveredMarkers;
+    private ArrayList<Polygon> discoveredPolygons;
+    private Marker myMarker;
     private TextView coordinate;
     private QueerClient queerClient;
     private int mStyleIds[] = {
@@ -158,6 +160,8 @@ public class MapActivity extends AppCompatActivity implements
         coordinate = (TextView) findViewById(R.id.coordinates);
         setSupportActionBar(toolbar);
 
+        discoveredMarkers = new ArrayList<>();
+        discoveredPolygons = new ArrayList<>();
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -384,21 +388,19 @@ public class MapActivity extends AppCompatActivity implements
         result.setResultCallback(this);
     }
 
-    /**
-     * Handles the Stop Updates button, and requests removal of location updates.
-     */
-    public void stopUpdatesButtonHandler(View view) {
-        // It is a good practice to remove location requests when the activity is in a paused or
-        // stopped state. Doing so helps battery performance and is especially
-        // recommended in applications that request frequent location updates.
-        stopLocationUpdates();
-    }
+
 
     @Override
     public void onLocationChanged(Location location) {
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-//        updateUI();
+        if (myMarker != null)
+            myMarker.remove();
+        myMarker = mMap.addMarker(new MarkerOptions()
+                .title("You Are Here")
+                .position(new LatLng(location.getLatitude(),location.getLongitude()))
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin6)));
+
         checkNearLocation(location);
 
     }
@@ -411,12 +413,13 @@ public class MapActivity extends AppCompatActivity implements
                 Location associatedLocation = new Location("");
                 associatedLocation.setLatitude(allLocation.getQCoordinates().getCoordinates().get(0).getLat());
                 associatedLocation.setLongitude(allLocation.getQCoordinates().getCoordinates().get(0).getLon());
-                if (associatedLocation.distanceTo(location) < 50) {
+                if (associatedLocation.distanceTo(location) < 50 && !alreadyDiscovered(allLocation)) {
 //                    Toast.makeText(this, location.getLatitude() + "," + location.getLongitude(),
 //                            Toast.LENGTH_SHORT).show();
                     queerClient.setDiscoveryStatus(new VolleySetDiscoveryCallback() {
                         @Override
                         public void onSuccess(boolean status) {
+
                             Toast.makeText(getApplicationContext(), "Found Something",
                                     Toast.LENGTH_SHORT).show();
 
@@ -429,8 +432,21 @@ public class MapActivity extends AppCompatActivity implements
                     }, allLocation.getId());
                 }
 
+            } else if (allLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POLYGON){
+
+                LatLng latLng = new LatLng(allLocation.getQCoordinates().getCoordinates().get(0).getLat(),allLocation.getQCoordinates().getCoordinates().get(0).getLon());
+//                PolyUtil
+//                isPointInPolygon(latLng,)
             }
         }
+    }
+
+    private boolean alreadyDiscovered(QLocation allLocation) {
+        for (QLocation discoveredLocation : discoveredLocations) {
+            if (allLocation.getId() == discoveredLocation.getId())
+                return true;
+        }
+        return false;
     }
 
     @Override
@@ -624,7 +640,9 @@ public class MapActivity extends AppCompatActivity implements
                 queerClient.getMyLocations(new VolleyMyCoordinatesCallback() {
                     @Override
                     public void onSuccess(QLocation[] queerLocations) {
-                        mMap.clear();
+                        for (Marker marker : discoveredMarkers) {
+                            marker.remove();
+                        }
 
 //                        if (discoveredLocations == null || discoveredLocations.length == 0)
                         discoveredLocations= null;
@@ -634,17 +652,21 @@ public class MapActivity extends AppCompatActivity implements
                             if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POINT) {
                                 Coordinate latlog = queerLocation.getQCoordinates().getCoordinates().get(0);
                                 LatLng testLocation4 =  new LatLng(latlog.getLat(), latlog.getLon());
-                                mMap.addMarker(new MarkerOptions()
+
+                                discoveredMarkers.add(mMap.addMarker(new MarkerOptions()
                                         .position(testLocation4)
                                         .title(queerLocation.getName())
                                         .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin5)));
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin5))));
                             } else if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POLYGON){
                                 PolygonOptions polygonOptions = new PolygonOptions();
                                 for (Coordinate coordinate1 : queerLocation.getQCoordinates().getCoordinates()) {
                                     polygonOptions.add(new LatLng(coordinate1.getLat(),coordinate1.getLon()));
                                 }
-                                mMap.addPolygon(polygonOptions.fillColor(Color.GREEN));
+                                for (Polygon discoveredPolygon : discoveredPolygons) {
+                                    discoveredPolygon.remove();
+                                }
+                                discoveredPolygons.add(mMap.addPolygon(polygonOptions.fillColor(Color.GREEN)));
                             }
                         }
 
@@ -848,7 +870,7 @@ public class MapActivity extends AppCompatActivity implements
         GalleryActivity.gallery = qGallery;
         Intent map = new Intent(MapActivity.this, GalleryActivity.class);
         startActivity(map);
-        finish();
+
     }
 
 
@@ -885,5 +907,38 @@ public class MapActivity extends AppCompatActivity implements
         }
         return null;
 
+    }
+
+    private boolean isPointInPolygon(LatLng tap, ArrayList<LatLng> vertices) {
+        int intersectCount = 0;
+        for (int j = 0; j < vertices.size() - 1; j++) {
+            if (rayCastIntersect(tap, vertices.get(j), vertices.get(j + 1))) {
+                intersectCount++;
+            }
+        }
+
+        return ((intersectCount % 2) == 1); // odd = inside, even = outside;
+    }
+
+    private boolean rayCastIntersect(LatLng tap, LatLng vertA, LatLng vertB) {
+
+        double aY = vertA.latitude;
+        double bY = vertB.latitude;
+        double aX = vertA.longitude;
+        double bX = vertB.longitude;
+        double pY = tap.latitude;
+        double pX = tap.longitude;
+
+        if ((aY > pY && bY > pY) || (aY < pY && bY < pY)
+                || (aX < pX && bX < pX)) {
+            return false; // a and b can't both be above or below pt.y, and a or
+            // b must be east of pt.x
+        }
+
+        double m = (aY - bY) / (aX - bX); // Rise over run
+        double bee = (-aX) * m + aY; // y = mx + b
+        double x = (pY - bee) / m; // algebra is neat!
+
+        return x > pX;
     }
 }

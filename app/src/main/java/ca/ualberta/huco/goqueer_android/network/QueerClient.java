@@ -120,11 +120,7 @@ public class QueerClient {
                     @Override
                     public void onResponse(String response) {
                         Gson gson = new Gson();
-
                         QGallery[] gallery = gson.fromJson(response, QGallery[].class);
-//                        for (QLocation location : discoveredQLocations) {
-//                            location.setCoordinates(new QCoordinate(location.getCoordinate()));
-//                        }
                         if (gallery.length>0)
                             volleyMyGalleryInfoCallback.onSuccess(gallery[0]);
                         else volleyMyGalleryInfoCallback.onSuccess(null);
@@ -138,8 +134,8 @@ public class QueerClient {
         queue.add(stringRequest);
     }
 
-    public void setDiscoveryStatus(final VolleySetDiscoveryCallback volleySetDiscoveryCallback ,long discoveryStatus) {
-        String newurl = url + "/client/setDiscoveryStatus?location_id=" + discoveryStatus;
+    public void setDiscoveryStatus(final VolleySetDiscoveryCallback volleySetDiscoveryCallback ,long locationId) {
+        String newurl = url + "/client/setDiscoveryStatus?location_id=" + locationId +"&device_id=" + device_id;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, newurl,
                 new Response.Listener<String>() {
                     @Override
