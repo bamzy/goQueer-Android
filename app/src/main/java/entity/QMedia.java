@@ -9,6 +9,9 @@ public class QMedia {
     private String source;
     private String description;
     private String name;
+    private String publish_date;
+    private String display_date;
+
 
     public long getId() {
         return id;

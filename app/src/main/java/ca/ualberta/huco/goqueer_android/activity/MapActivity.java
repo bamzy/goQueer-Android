@@ -4,7 +4,6 @@ package ca.ualberta.huco.goqueer_android.activity;
  * Created by Circa Lab on 2/5/2017.
  */
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,7 +16,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -134,6 +132,7 @@ public class MapActivity extends AppCompatActivity implements
 
     private GoogleMap mMap;
     private ImageView galleryThumbnail;
+    private TextView galleryTitle;
     private QLocation[] discoveredLocations;
     private LocationManager locationManager;
     private List<QGallery> myGalleries = new CopyOnWriteArrayList<QGallery>();
@@ -156,7 +155,7 @@ public class MapActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         coordinate = (TextView) findViewById(R.id.coordinates);
         setSupportActionBar(toolbar);
 
@@ -164,19 +163,20 @@ public class MapActivity extends AppCompatActivity implements
         discoveredPolygons = new ArrayList<>();
 
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.map_drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.map_nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         queerClient = new QueerClient(getApplicationContext());
         galleryThumbnail = (ImageView) findViewById(R.id.galleryThumbnail);
+        galleryTitle = (TextView) findViewById(R.id.galleryTitle);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 
@@ -610,11 +610,7 @@ public class MapActivity extends AppCompatActivity implements
                 .build();                   // Creates a CameraPosition from the builder
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        else prepareLocationManager();
-        if (android.os.Build.VERSION.SDK_INT < 23)
-            prepareLocationManager();
+
         
 
         MapStyleOptions style;
@@ -643,8 +639,6 @@ public class MapActivity extends AppCompatActivity implements
                         for (Marker marker : discoveredMarkers) {
                             marker.remove();
                         }
-
-//                        if (discoveredLocations == null || discoveredLocations.length == 0)
                         discoveredLocations= null;
                         discoveredLocations = queerLocations;
 
@@ -753,29 +747,6 @@ public class MapActivity extends AppCompatActivity implements
     }
 
 
-    private void prepareLocationManager() {
-//        MyLocation.LocationResult locationResult = new MyLocation.LocationResult(){
-//            @Override
-//            public void gotLocation(final Location location){
-//
-//                MapActivity.this.runOnUiThread(new Runnable() {
-//                    public void run() {
-//                        String value = "(" + location.getLongitude() + " , " + location.getLatitude() + ")";
-//                        coordinate.setText(value);
-//
-//                    }
-//                });
-//            }
-//        };
-//        MyLocation myLocation = new MyLocation(this);
-//        myLocation.getLocation(this, locationResult);
-
-    }
-
-
-
-
-
 
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
@@ -783,7 +754,7 @@ public class MapActivity extends AppCompatActivity implements
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        prepareLocationManager();
+
 
                 } else {
                     // permission denied, boo! Disable the
@@ -798,7 +769,7 @@ public class MapActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.map_drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -853,7 +824,7 @@ public class MapActivity extends AppCompatActivity implements
 
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.map_drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -883,8 +854,11 @@ public class MapActivity extends AppCompatActivity implements
             marker.showInfoWindow();
         }
         final QGallery qGallery = findAssociatedGallery(marker);
-        if (qGallery != null && qGallery.getMedias().size()>0)
+        if (qGallery != null && qGallery.getMedias().size()>0){
             Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + qGallery.getMedias().get(0).getId()).into(galleryThumbnail);
+            galleryTitle.setText(qGallery.getName());
+
+        }
         galleryThumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
