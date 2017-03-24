@@ -4,6 +4,7 @@ package ca.ualberta.huco.goqueer_android.activity;
  * Created by Circa Lab on 2/5/2017.
  */
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,6 +17,8 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -110,6 +113,7 @@ public class MapActivity extends AppCompatActivity implements
     protected final static String KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates";
     protected final static String KEY_LOCATION = "location";
     protected final static String KEY_LAST_UPDATED_TIME_STRING = "last-updated-time-string";
+    private static final int MY_PERMISSION_REQUEST_READ_FINE_LOCATION = 1;
 
     protected Boolean mRequestingLocationUpdates;
     protected String mLastUpdateTime;
@@ -134,7 +138,6 @@ public class MapActivity extends AppCompatActivity implements
     private ImageView galleryThumbnail;
     private TextView galleryTitle;
     private QLocation[] discoveredLocations;
-    private LocationManager locationManager;
     private List<QGallery> myGalleries = new CopyOnWriteArrayList<QGallery>();
     private ArrayList<QLocation> allLocations;
     private ArrayList<Marker> discoveredMarkers;
@@ -163,6 +166,8 @@ public class MapActivity extends AppCompatActivity implements
         discoveredPolygons = new ArrayList<>();
 
 
+
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.map_drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -177,7 +182,7 @@ public class MapActivity extends AppCompatActivity implements
         queerClient = new QueerClient(getApplicationContext());
         galleryThumbnail = (ImageView) findViewById(R.id.galleryThumbnail);
         galleryTitle = (TextView) findViewById(R.id.galleryTitle);
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 
         mRequestingLocationUpdates = false;
@@ -188,12 +193,69 @@ public class MapActivity extends AppCompatActivity implements
 
         // Kick off the process of building a GoogleApiClient and requesting the LocationServices
         // API.
+
         buildGoogleApiClient();
-        createLocationRequest();
-        buildLocationSettingsRequest();
-        startUpdatesButtonHandler();
+        if (ContextCompat.checkSelfPermission(MapActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MapActivity.this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(MapActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSION_REQUEST_READ_FINE_LOCATION);
+
+                // MY_PERMISSION_REQUEST_READ_FINE_LOCATION is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        } else {
+            createLocationRequest();
+            buildLocationSettingsRequest();
+            startUpdatesButtonHandler();
+        }
 
 
+
+
+
+
+
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSION_REQUEST_READ_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    createLocationRequest();
+                    buildLocationSettingsRequest();
+                    startUpdatesButtonHandler();
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 
     protected void buildLocationSettingsRequest() {
@@ -748,24 +810,6 @@ public class MapActivity extends AppCompatActivity implements
 
 
 
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case 1: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
-            }
-            // other 'case' lines to check for other
-            // permissions this app might request
-        }
-    }
 
     @Override
     public void onBackPressed() {
