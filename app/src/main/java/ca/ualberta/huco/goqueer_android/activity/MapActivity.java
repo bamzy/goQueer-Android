@@ -16,6 +16,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -650,6 +651,7 @@ public class MapActivity extends AppCompatActivity implements
                 return;
         }
         mMap.setMapStyle(style);
+
     }
 
 
@@ -661,17 +663,24 @@ public class MapActivity extends AppCompatActivity implements
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        LatLng testLocation =  new LatLng(53.550247, -113.498094);
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(testLocation, 13));
+        final LatLng testLocation =  new LatLng(53.557811408, -113.46774101257326);
 
-        CameraPosition cameraPosition = new CameraPosition.Builder()
+
+        final CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(testLocation)      // Sets the center of the map to location user
-                .zoom(14)                   // Sets the zoom
+                .zoom(11)                   // Sets the zoom
                 .bearing(0)                // Sets the orientation of the camera to east
                 .tilt(40)                   // Sets the tilt of the camera to 30 degrees
                 .build();                   // Creates a CameraPosition from the builder
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+//                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(testLocation, 13));
+            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
+            }
+        }, 4000);
 
         
 
@@ -680,6 +689,7 @@ public class MapActivity extends AppCompatActivity implements
         mMap.setMapStyle(style);
         mMap.getUiSettings().setMapToolbarEnabled(false);
         mMap.setOnInfoWindowClickListener(this);
+        Toast.makeText(this, "Welcome", Toast.LENGTH_SHORT).show();
         initiateMyLocationPolling();
 
     }

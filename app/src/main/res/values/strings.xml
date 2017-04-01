@@ -10,7 +10,7 @@
     <string name="style_label_grayscale">Grayscale</string>
     <string name="style_label_no_pois_no_transit">No POIs or transit</string>
     <string name="style_label_default">Default</string>
-    <string name="style_choose">Choose style</string>
+    <string name="style_choose">Map style</string>
     <string name="style_set_to">Style set to: %1$s</string>
     <string name="gallery">Gallery</string>
 </resources>

@@ -2,6 +2,7 @@ package ca.ualberta.huco.goqueer_android.activity;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -38,7 +39,7 @@ public class GalleryActivity extends AppCompatActivity implements
     public static QGallery gallery;
     private int currentIndex;
     boolean isImageFitToScreen;
-    private TextView mediaTitle, mediaDescription;
+    private TextView mediaTitle, mediaDescription,pageNumber;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -49,8 +50,9 @@ public class GalleryActivity extends AppCompatActivity implements
         mainMediaImage = (ImageView) findViewById(R.id.mainMediaImage);
         mediaTitle = (TextView) findViewById(R.id.mediaTitle);
         mediaDescription = (TextView) findViewById(R.id.mediaDescription);
+        pageNumber = (TextView) findViewById(R.id.pageNumber);
         currentIndex = 0;
-        setMediaContent(gallery.getMedias().get(currentIndex).getId());
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.gallery_toolbar);
 
@@ -87,6 +89,16 @@ public class GalleryActivity extends AppCompatActivity implements
                 }
             }
         });
+
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setMediaContent(currentIndex);
+                //Do something after 100ms
+            }
+        }, 1000);
     }
 
     @Override
@@ -97,7 +109,8 @@ public class GalleryActivity extends AppCompatActivity implements
 
     public void setMediaContent(long mediaIndex) {
         if (mediaIndex < gallery.getMedias().size() && mediaIndex>=0){
-            mediaTitle.setText(gallery.getMedias().get(currentIndex).getName()+"(" +(currentIndex+1) + "/" + gallery.getMedias().size() + ")");
+            mediaTitle.setText(gallery.getMedias().get(currentIndex).getName());
+            pageNumber.setText("(" +(currentIndex+1) + "/" + gallery.getMedias().size() + ")");
             mediaDescription.setText(gallery.getMedias().get(currentIndex).getDescription() );
             mediaDescription.setMovementMethod(new ScrollingMovementMethod());
             Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id="+ gallery.getMedias().get(currentIndex).getId()).into(mainMediaImage);
