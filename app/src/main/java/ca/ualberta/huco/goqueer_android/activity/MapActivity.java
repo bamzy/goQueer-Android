@@ -14,7 +14,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
@@ -32,6 +31,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -144,7 +144,7 @@ public class MapActivity extends AppCompatActivity implements
     private ArrayList<Marker> discoveredMarkers;
     private ArrayList<Polygon> discoveredPolygons;
     private Marker myMarker;
-    private TextView coordinate;
+    private LinearLayout galleryThumbnailLayout;
     private QueerClient queerClient;
     private int mStyleIds[] = {
             R.string.style_label_retro,
@@ -160,7 +160,7 @@ public class MapActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        coordinate = (TextView) findViewById(R.id.coordinates);
+        TextView coordinate = (TextView) findViewById(R.id.coordinates);
         setSupportActionBar(toolbar);
 
         discoveredMarkers = new ArrayList<>();
@@ -183,6 +183,7 @@ public class MapActivity extends AppCompatActivity implements
         queerClient = new QueerClient(getApplicationContext());
         galleryThumbnail = (ImageView) findViewById(R.id.galleryThumbnail);
         galleryTitle = (TextView) findViewById(R.id.galleryTitle);
+        galleryThumbnailLayout = (LinearLayout) findViewById(R.id.galleryThumbnailLayout);
 //        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 
@@ -910,6 +911,7 @@ public class MapActivity extends AppCompatActivity implements
         final QGallery qGallery = findAssociatedGallery(marker);
         if (qGallery != null && qGallery.getMedias().size()>0){
             Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + qGallery.getMedias().get(0).getId()).into(galleryThumbnail);
+            galleryThumbnailLayout.setBackgroundColor(Color.GRAY);
             galleryTitle.setText(qGallery.getName());
 
         }
