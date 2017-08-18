@@ -76,6 +76,7 @@ import ca.ualberta.huco.goqueer_android.network.QueerClient;
 import ca.ualberta.huco.goqueer_android.network.VolleyMyCoordinatesCallback;
 import ca.ualberta.huco.goqueer_android.network.VolleyMyGalleriesCallback;
 import ca.ualberta.huco.goqueer_android.network.VolleyMyGalleryInfoCallback;
+import ca.ualberta.huco.goqueer_android.network.VolleyMyHintCallback;
 import ca.ualberta.huco.goqueer_android.network.VolleySetDiscoveryCallback;
 import entity.Coordinate;
 import entity.QGallery;
@@ -876,6 +877,20 @@ public class MapActivity extends AppCompatActivity implements
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
+
+        } else if (id == R.id.nav_hint) {
+            queerClient.getHint(new VolleyMyHintCallback() {
+                @Override
+                public void onSuccess(String response) {
+                    Toast.makeText(getApplicationContext(), response, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onError(VolleyError result) {
+
+                }
+            });
+
 
         }
 
