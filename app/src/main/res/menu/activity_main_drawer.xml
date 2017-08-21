@@ -7,6 +7,10 @@
             android:icon="@drawable/ic_menu_set"
             android:title="Set" />
         <item
+            android:id="@+id/nav_setLocation"
+            android:icon="@drawable/ic_location_set"
+            android:title="Set Location" />
+        <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_gallery"
             android:title="Gallery" />

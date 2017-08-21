@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 
@@ -25,11 +26,13 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -387,10 +390,13 @@ public class MapActivity extends AppCompatActivity implements
         });
     }
 
+
+    private String inputText = "";
     @Override
     protected void onStart() {
         super.onStart();
         mGoogleApiClient.connect();
+
     }
 
     @Override
@@ -872,10 +878,39 @@ public class MapActivity extends AppCompatActivity implements
 
         } else if (id == R.id.nav_slideshow) {
 
+        } else if (id == R.id.nav_setLocation) {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Enter the city name");
+
+            final EditText input = new EditText(this);
+            input.setInputType(InputType.TYPE_CLASS_TEXT );
+            builder.setView(input);
+
+            builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    inputText = input.getText().toString();
+                    SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("locationName", inputText);
+                    editor.commit();
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
+
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
-
+            SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+            Toast.makeText(this, sharedPreferences.getString("locationName",null), Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_send) {
 
         } else if (id == R.id.nav_hint) {
@@ -887,6 +922,7 @@ public class MapActivity extends AppCompatActivity implements
 
                 @Override
                 public void onError(VolleyError result) {
+                    Toast.makeText(getApplicationContext(), "There was an issue retrieving data from server", Toast.LENGTH_SHORT).show();
 
                 }
             });
