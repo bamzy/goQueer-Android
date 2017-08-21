@@ -882,7 +882,7 @@ public class MapActivity extends AppCompatActivity implements
             queerClient.getHint(new VolleyMyHintCallback() {
                 @Override
                 public void onSuccess(String response) {
-                    Toast.makeText(getApplicationContext(), response, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
                 }
 
                 @Override
