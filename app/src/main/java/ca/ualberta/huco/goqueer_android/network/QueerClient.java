@@ -1,8 +1,10 @@
 package ca.ualberta.huco.goqueer_android.network;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -19,6 +21,8 @@ import entity.QCoordinate;
 import entity.QGallery;
 import entity.QLocation;
 import entity.QMedia;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by Circa Lab on 2/14/2017.
@@ -41,19 +45,21 @@ public class QueerClient {
     }
 
 
-    public void getMyLocations(final VolleyMyCoordinatesCallback volleyMyCoordinatesCallback){
-        String myLocationsUrl = url + "/client/getMyLocations?device_id=" + device_id;
+    public void getMyLocations(final VolleyMyCoordinatesCallback volleyMyCoordinatesCallback, String profileName){
+        String myLocationsUrl = url + "/client/getMyLocations?device_id=" + device_id + "&profile_name=" + profileName  ;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, myLocationsUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         Gson gson = new Gson();
-                        QLocation[] discoveredQLocations = gson.fromJson(response, QLocation[].class);
-                        for (QLocation location : discoveredQLocations) {
-                            location.setCoordinates(new QCoordinate(location.getCoordinate()));
+                        if (response.length() !=0) {
+                            QLocation[] discoveredQLocations = gson.fromJson(response, QLocation[].class);
+                            for (QLocation location : discoveredQLocations) {
+                                location.setCoordinates(new QCoordinate(location.getCoordinate()));
 
+                            }
+                            volleyMyCoordinatesCallback.onSuccess(discoveredQLocations);
                         }
-                        volleyMyCoordinatesCallback.onSuccess(discoveredQLocations);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -65,8 +71,8 @@ public class QueerClient {
     }
 
 
-    public void getAllLocations(final VolleyMyCoordinatesCallback volleyMyCoordinatesCallback){
-        String allLocationsUrl = url + "/client/getAllLocations?device_id=" + device_id;
+    public void getAllLocations(final VolleyMyCoordinatesCallback volleyMyCoordinatesCallback,String profileName){
+        String allLocationsUrl = url + "/client/getAllLocations?device_id=" + device_id+ "&profile_name=" + profileName  ;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, allLocationsUrl,
                 new Response.Listener<String>() {
                     @Override
@@ -152,8 +158,8 @@ public class QueerClient {
         queue.add(stringRequest);
     }
 
-    public void setDiscoveryStatus(final VolleySetDiscoveryCallback volleySetDiscoveryCallback ,long locationId) {
-        String newurl = url + "/client/setDiscoveryStatus?location_id=" + locationId +"&device_id=" + device_id;
+    public void setDiscoveryStatus(final VolleySetDiscoveryCallback volleySetDiscoveryCallback ,long locationId,String profileName) {
+        String newurl = url + "/client/setDiscoveryStatus?location_id=" + locationId +"&device_id=" + device_id+ "&profile_name=" + profileName  ;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, newurl,
                 new Response.Listener<String>() {
                     @Override

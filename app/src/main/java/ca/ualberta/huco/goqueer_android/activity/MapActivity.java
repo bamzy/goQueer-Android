@@ -159,6 +159,8 @@ public class MapActivity extends AppCompatActivity implements
     };
     private static final String SELECTED_STYLE = "selected_style";
     private int mSelectedStyleId = R.string.style_label_default;
+    private String locationName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -500,7 +502,7 @@ public class MapActivity extends AppCompatActivity implements
                         public void onError() {
 
                         }
-                    }, allLocation.getId());
+                    }, allLocation.getId(),getDefinedLocation());
                 }
 
             } else if (allLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POLYGON){
@@ -753,7 +755,7 @@ public class MapActivity extends AppCompatActivity implements
                     public void onError(VolleyError result) {
 
                     }
-                });
+                },getDefinedLocation());
 
 
             }
@@ -823,7 +825,7 @@ public class MapActivity extends AppCompatActivity implements
             public void onError(VolleyError result) {
 
             }
-        });
+        },getDefinedLocation());
     }
 
 
@@ -909,8 +911,7 @@ public class MapActivity extends AppCompatActivity implements
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
-            SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-            Toast.makeText(this, sharedPreferences.getString("locationName",null), Toast.LENGTH_SHORT).show();
+
         } else if (id == R.id.nav_send) {
 
         } else if (id == R.id.nav_hint) {
@@ -933,6 +934,18 @@ public class MapActivity extends AppCompatActivity implements
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.map_drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private String getDefinedLocation() {
+        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+
+        if (locationName != null)
+            return locationName;
+        else {
+            locationName = sharedPreferences.getString("locationName", null);
+            return locationName;
+        }
+
     }
 
     @Override
