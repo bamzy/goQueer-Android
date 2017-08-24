@@ -926,7 +926,7 @@ public class MapActivity extends AppCompatActivity implements
                     Toast.makeText(getApplicationContext(), "There was an issue retrieving data from server", Toast.LENGTH_SHORT).show();
 
                 }
-            });
+            },getDefinedLocation());
 
 
         }

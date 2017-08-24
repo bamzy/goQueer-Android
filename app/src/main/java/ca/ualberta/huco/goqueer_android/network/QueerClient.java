@@ -141,8 +141,8 @@ public class QueerClient {
     }
 
 
-    public void getHint(final VolleyMyHintCallback volleyMyHintCallback){
-        String allLocationsUrl = url + "/client/getHint?device_id=" + device_id;
+    public void getHint(final VolleyMyHintCallback volleyMyHintCallback,String profile_name){
+        String allLocationsUrl = url + "/client/getHint?device_id=" + device_id +"&profile_name=" + profile_name;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, allLocationsUrl,
                 new Response.Listener<String>() {
                     @Override
