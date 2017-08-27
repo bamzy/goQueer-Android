@@ -20,13 +20,18 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
+import com.android.volley.VolleyError;
 import com.squareup.picasso.Picasso;
 
 
 import ca.ualberta.huco.goqueer_android.R;
 import ca.ualberta.huco.goqueer_android.config.Constants;
+import ca.ualberta.huco.goqueer_android.network.QueerClient;
+import ca.ualberta.huco.goqueer_android.network.VolleyGetSetSummaryCallback;
+import ca.ualberta.huco.goqueer_android.network.VolleyMyHintCallback;
 import entity.QGallery;
 
 /**
@@ -37,6 +42,7 @@ public class GalleryActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener{
     private ImageView mainMediaImage;
     public static QGallery gallery;
+    private QueerClient queerClient;
     private int currentIndex;
     boolean isImageFitToScreen;
     private TextView mediaTitle, mediaDescription,pageNumber;
@@ -104,6 +110,8 @@ public class GalleryActivity extends AppCompatActivity implements
     @Override
     public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
         View view = super.onCreateView(parent, name, context, attrs);
+         queerClient = new QueerClient(getApplicationContext());
+
         return view;
     }
 
@@ -163,7 +171,21 @@ public class GalleryActivity extends AppCompatActivity implements
 
         if (id == R.id.nav_set) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_discovery_status) {
+
+            queerClient.getDiscoveredSetSummary(new VolleyGetSetSummaryCallback() {
+                @Override
+                public void onSuccess(String response) {
+                    Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onError(VolleyError result) {
+                    Toast.makeText(getApplicationContext(), "There was an issue retrieving data from server", Toast.LENGTH_SHORT).show();
+
+                }
+            },gallery.getId(),MapActivity.getDefinedLocation());
+
 
 
 
@@ -172,8 +194,6 @@ public class GalleryActivity extends AppCompatActivity implements
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
 
         }
 

@@ -142,6 +142,7 @@ public class MapActivity extends AppCompatActivity implements
     private GoogleMap mMap;
     private ImageView galleryThumbnail;
     private TextView galleryTitle;
+    private static SharedPreferences sharedPreferences;
     private QLocation[] discoveredLocations;
     private List<QGallery> myGalleries = new CopyOnWriteArrayList<QGallery>();
     private ArrayList<QLocation> allLocations;
@@ -173,7 +174,7 @@ public class MapActivity extends AppCompatActivity implements
         discoveredPolygons = new ArrayList<>();
 
 
-
+         sharedPreferences = getPreferences(MODE_PRIVATE);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.map_drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -912,8 +913,6 @@ public class MapActivity extends AppCompatActivity implements
 
         } else if (id == R.id.nav_share) {
 
-        } else if (id == R.id.nav_send) {
-
         } else if (id == R.id.nav_hint) {
             queerClient.getHint(new VolleyMyHintCallback() {
                 @Override
@@ -936,16 +935,12 @@ public class MapActivity extends AppCompatActivity implements
         return true;
     }
 
-    private String getDefinedLocation() {
-        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+    public static String getDefinedLocation() {
 
-        if (locationName != null)
-            return locationName;
-        else {
-            locationName = sharedPreferences.getString("locationName", null);
-            return locationName;
-        }
+        if (sharedPreferences != null)
+        return    sharedPreferences.getString("locationName", null);
 
+        else return null;
     }
 
     @Override

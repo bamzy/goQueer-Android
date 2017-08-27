@@ -141,13 +141,18 @@ public class QueerClient {
     }
 
 
-    public void getHint(final VolleyMyHintCallback volleyMyHintCallback,String profile_name){
-        String allLocationsUrl = url + "/client/getHint?device_id=" + device_id +"&profile_name=" + profile_name;
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, allLocationsUrl,
+    public void getHint(final VolleyMyHintCallback volleyMyHintCallback, String profile_name) {
+
+    }
+
+    public void setDiscoveryStatus(final VolleySetDiscoveryCallback volleySetDiscoveryCallback ,long locationId,String profileName) {
+        String newurl = url + "/client/setDiscoveryStatus?location_id=" + locationId +"&device_id=" + device_id+ "&profile_name=" + profileName  ;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, newurl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        volleyMyHintCallback.onSuccess(response);
+                        volleySetDiscoveryCallback.onSuccess(true);
+
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -158,13 +163,13 @@ public class QueerClient {
         queue.add(stringRequest);
     }
 
-    public void setDiscoveryStatus(final VolleySetDiscoveryCallback volleySetDiscoveryCallback ,long locationId,String profileName) {
-        String newurl = url + "/client/setDiscoveryStatus?location_id=" + locationId +"&device_id=" + device_id+ "&profile_name=" + profileName  ;
+    public void getDiscoveredSetSummary(final VolleyGetSetSummaryCallback volleyGetSetSummaryCallback , long id,String profileName) {
+        String newurl = url + "/client/getSetStatusSummary?gallery_id=" + id +"&device_id=" + device_id+"&profile_name=" + profileName  ;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, newurl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        volleySetDiscoveryCallback.onSuccess(true);
+                        volleyGetSetSummaryCallback.onSuccess(response);
 
                     }
                 }, new Response.ErrorListener() {
