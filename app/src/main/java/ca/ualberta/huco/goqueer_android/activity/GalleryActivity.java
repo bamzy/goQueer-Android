@@ -73,6 +73,9 @@ public class GalleryActivity extends AppCompatActivity implements
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+        NavigationView navigationView = (NavigationView) findViewById(R.id.gallery_nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
         FloatingActionButton fabn = (FloatingActionButton) findViewById(R.id.next);
         fabn.setOnClickListener(new View.OnClickListener() {
             @Override
