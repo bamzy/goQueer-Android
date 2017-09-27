@@ -888,6 +888,8 @@ public class MapActivity extends AppCompatActivity implements
 
             final EditText input = new EditText(this);
             input.setInputType(InputType.TYPE_CLASS_TEXT );
+            if (!"".equals(getDefinedLocation()))
+                input.setText(getDefinedLocation());
             builder.setView(input);
 
             builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {

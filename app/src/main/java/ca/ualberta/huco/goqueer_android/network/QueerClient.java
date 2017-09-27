@@ -142,7 +142,20 @@ public class QueerClient {
 
 
     public void getHint(final VolleyMyHintCallback volleyMyHintCallback, String profile_name) {
-
+        String allLocationsUrl = url + "/client/getHint?device_id=" + device_id +"&profile_name=" + profile_name;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, allLocationsUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        volleyMyHintCallback.onSuccess(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.w(Constants.LOG_TAG,error.getCause());
+            }
+        });
+        queue.add(stringRequest);
     }
 
     public void setDiscoveryStatus(final VolleySetDiscoveryCallback volleySetDiscoveryCallback ,long locationId,String profileName) {
