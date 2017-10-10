@@ -722,6 +722,9 @@ public class MapActivity extends AppCompatActivity implements
                         for (Marker marker : discoveredMarkers) {
                             marker.remove();
                         }
+                        for (Polygon marker : discoveredPolygons) {
+                            marker.remove();
+                        }
                         discoveredLocations= null;
                         discoveredLocations = queerLocations;
 
@@ -737,12 +740,18 @@ public class MapActivity extends AppCompatActivity implements
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin5))));
                             } else if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POLYGON){
                                 PolygonOptions polygonOptions = new PolygonOptions();
+                                LatLng temp = new LatLng(0,0);
                                 for (Coordinate coordinate1 : queerLocation.getQCoordinates().getCoordinates()) {
-                                    polygonOptions.add(new LatLng(coordinate1.getLat(),coordinate1.getLon()));
+                                    temp = new LatLng(coordinate1.getLat(),coordinate1.getLon());
+                                    polygonOptions.add(temp);
                                 }
-                                for (Polygon discoveredPolygon : discoveredPolygons) {
-                                    discoveredPolygon.remove();
-                                }
+                                mMap.addMarker(new MarkerOptions()
+                                                .position(temp)
+                                                .title(queerLocation.getName())
+                                                .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
+                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin))
+                                );
+
                                 discoveredPolygons.add(mMap.addPolygon(polygonOptions.fillColor(Color.GREEN)));
                             }
                         }
@@ -930,7 +939,12 @@ public class MapActivity extends AppCompatActivity implements
             },getDefinedLocation());
 
 
+        } else if (id == R.id.nav_exit ) {
+            Toast.makeText(getApplicationContext(), "Bye!", Toast.LENGTH_LONG).show();
+            this.finish();
+            System.exit(0);
         }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.map_drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
