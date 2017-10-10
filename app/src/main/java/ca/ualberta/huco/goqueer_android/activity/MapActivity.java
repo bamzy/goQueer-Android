@@ -508,9 +508,30 @@ public class MapActivity extends AppCompatActivity implements
 
             } else if (allLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POLYGON){
 
-                LatLng latLng = new LatLng(allLocation.getQCoordinates().getCoordinates().get(0).getLat(),allLocation.getQCoordinates().getCoordinates().get(0).getLon());
-//                PolyUtil
-//                isPointInPolygon(latLng,)
+                LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+                ArrayList<LatLng> temp = new ArrayList<>();
+                for (Coordinate coordinate1 : allLocation.getQCoordinates().getCoordinates()) {
+                     temp.add(new LatLng(coordinate1.getLat(),coordinate1.getLon()));
+
+                }
+                if (isPointInPolygon(latLng,temp) && !alreadyDiscovered(allLocation)){
+                    queerClient.setDiscoveryStatus(new VolleySetDiscoveryCallback() {
+                        @Override
+                        public void onSuccess(boolean status) {
+
+                            Toast.makeText(getApplicationContext(), "Found Something",
+                                    Toast.LENGTH_LONG).show();
+
+                        }
+
+                        @Override
+                        public void onError() {
+
+                        }
+                    }, allLocation.getId(),getDefinedLocation());
+                }
+
+
             }
         }
     }
@@ -1015,14 +1036,15 @@ public class MapActivity extends AppCompatActivity implements
     }
 
     private boolean isPointInPolygon(LatLng tap, ArrayList<LatLng> vertices) {
-        int intersectCount = 0;
-        for (int j = 0; j < vertices.size() - 1; j++) {
-            if (rayCastIntersect(tap, vertices.get(j), vertices.get(j + 1))) {
-                intersectCount++;
-            }
-        }
-
-        return ((intersectCount % 2) == 1); // odd = inside, even = outside;
+        return com.google.maps.android.PolyUtil.containsLocation(tap,vertices,true);
+//        int intersectCount = 0;
+//        for (int j = 0; j < vertices.size() - 1; j++) {
+//            if (rayCastIntersect(tap, vertices.get(j), vertices.get(j + 1))) {
+//                intersectCount++;
+//            }
+//        }
+//
+//        return ((intersectCount % 2) == 1); // odd = inside, even = outside;
     }
 
     private boolean rayCastIntersect(LatLng tap, LatLng vertA, LatLng vertB) {
