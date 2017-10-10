@@ -744,13 +744,13 @@ public class MapActivity extends AppCompatActivity implements
                                 for (Coordinate coordinate1 : queerLocation.getQCoordinates().getCoordinates()) {
                                     temp = new LatLng(coordinate1.getLat(),coordinate1.getLon());
                                     polygonOptions.add(temp);
+                                    discoveredMarkers.add(mMap.addMarker(new MarkerOptions()
+                                                    .position(temp)
+                                                    .title(queerLocation.getName())
+                                                    .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
+                                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin2))
+                                    ));
                                 }
-                                mMap.addMarker(new MarkerOptions()
-                                                .position(temp)
-                                                .title(queerLocation.getName())
-                                                .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
-                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin))
-                                );
 
                                 discoveredPolygons.add(mMap.addPolygon(polygonOptions.fillColor(Color.GREEN)));
                             }
