@@ -42,12 +42,15 @@
                 android:title="Share Your Discoveries" />
             <item
                 android:id="@+id/nav_hint"
-
                 android:icon="@drawable/ic_menu_hint"
                 android:title="Need a Hint?" />
+
+            <item
+                android:id="@+id/nav_ack"
+                android:icon="@drawable/ic_people_blackpx"
+                android:title="Acknowledgement" />
             <item
                 android:id="@+id/nav_exit"
-
                 android:icon="@drawable/ic_close_dark"
                 android:title="Exit" />
         </menu>

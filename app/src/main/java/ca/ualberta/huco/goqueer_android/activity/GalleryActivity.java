@@ -1,6 +1,8 @@
 package ca.ualberta.huco.goqueer_android.activity;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -8,6 +10,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.method.ScrollingMovementMethod;
@@ -198,11 +201,33 @@ public class GalleryActivity extends AppCompatActivity implements
 
         } else if (id == R.id.nav_share) {
 
+        } else if (id == R.id.nav_ack) {
+            showAlert("Acknowledgements:", "Maureen Engel and others");
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.gallery_drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+    private void showAlert(String title, String body){
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(getApplicationContext(), android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(getApplicationContext());
+        }
+        builder.setTitle(title)
+                .setMessage(body)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // continue with delete
+                    }
+                })
+
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
 
 }
