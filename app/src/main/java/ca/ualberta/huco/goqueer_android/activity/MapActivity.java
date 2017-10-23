@@ -32,6 +32,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -150,6 +151,7 @@ public class MapActivity extends AppCompatActivity implements
     private ArrayList<Polygon> discoveredPolygons;
     private Marker myMarker;
     private LinearLayout galleryThumbnailLayout;
+    private Button closeButton;
     private QueerClient queerClient;
     private int mStyleIds[] = {
             R.string.style_label_retro,
@@ -191,6 +193,7 @@ public class MapActivity extends AppCompatActivity implements
         galleryThumbnail = (ImageView) findViewById(R.id.galleryThumbnail);
         galleryTitle = (TextView) findViewById(R.id.galleryTitle);
         galleryThumbnailLayout = (LinearLayout) findViewById(R.id.galleryThumbnailLayout);
+        closeButton = (Button) findViewById(R.id.closeButton);
 //        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 
@@ -1006,11 +1009,20 @@ public class MapActivity extends AppCompatActivity implements
         }
         final QGallery qGallery = findAssociatedGallery(marker);
         if (qGallery != null && qGallery.getMedias().size()>0){
+            galleryThumbnailLayout.setVisibility(View.VISIBLE);
             Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + qGallery.getMedias().get(0).getId()).into(galleryThumbnail);
             galleryThumbnailLayout.setBackgroundColor(Color.GRAY);
             galleryTitle.setText(qGallery.getName());
+            closeButton.setVisibility(View.VISIBLE);
 
         }
+        closeButton.setOnClickListener(new Button.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                galleryThumbnailLayout.setVisibility(View.GONE);
+                closeButton.setVisibility(View.GONE);
+            }
+        });
         galleryThumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

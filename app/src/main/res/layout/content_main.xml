@@ -46,6 +46,7 @@
         tools:context=".activity.MapActivity"
         android:name="com.google.android.gms.maps.SupportMapFragment" />
     <LinearLayout
+
         android:id="@+id/galleryThumbnailLayout"
         android:layout_width="300dp"
         android:layout_height="200dp"
@@ -55,6 +56,14 @@
         android:layout_margin="20dp"
         android:orientation="vertical">
 
+        <Button
+            android:id="@+id/closeButton"
+            android:layout_width="20dp"
+            android:gravity="right"
+            android:visibility="gone"
+            android:layout_height="20dp"
+            android:background="@drawable/ic_close_black"
+            />
         <TextView
         android:id="@+id/galleryTitle"
         android:gravity="center"
