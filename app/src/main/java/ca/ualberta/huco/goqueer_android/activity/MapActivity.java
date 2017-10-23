@@ -6,6 +6,7 @@ package ca.ualberta.huco.goqueer_android.activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
@@ -23,7 +25,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
+
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
@@ -491,14 +493,11 @@ public class MapActivity extends AppCompatActivity implements
                 associatedLocation.setLatitude(allLocation.getQCoordinates().getCoordinates().get(0).getLat());
                 associatedLocation.setLongitude(allLocation.getQCoordinates().getCoordinates().get(0).getLon());
                 if (associatedLocation.distanceTo(location) < 50 && !alreadyDiscovered(allLocation)) {
-//                    Toast.makeText(this, location.getLatitude() + "," + location.getLongitude(),
-//                            Toast.LENGTH_SHORT).show();
                     queerClient.setDiscoveryStatus(new VolleySetDiscoveryCallback() {
                         @Override
                         public void onSuccess(boolean status) {
 
-                            Toast.makeText(getApplicationContext(), "Found Something",
-                                    Toast.LENGTH_SHORT).show();
+                            showAlert("Info!","You found something!");
 
                         }
 
@@ -522,8 +521,7 @@ public class MapActivity extends AppCompatActivity implements
                         @Override
                         public void onSuccess(boolean status) {
 
-                            Toast.makeText(getApplicationContext(), "Found Something",
-                                    Toast.LENGTH_LONG).show();
+                            showAlert("Info!","You found something!");
 
                         }
 
@@ -952,12 +950,14 @@ public class MapActivity extends AppCompatActivity implements
             queerClient.getHint(new VolleyMyHintCallback() {
                 @Override
                 public void onSuccess(String response) {
-                    Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                    showAlert("Hint:", response);
                 }
 
                 @Override
                 public void onError(VolleyError result) {
-                    Toast.makeText(getApplicationContext(), "There was an issue retrieving data from server", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getApplicationContext(), "There was an issue retrieving data from server", Toast.LENGTH_SHORT).show();
+                    showAlert("Hint:", "There was an issue retrieving data from server");
 
                 }
             },getDefinedLocation());
@@ -967,6 +967,8 @@ public class MapActivity extends AppCompatActivity implements
             Toast.makeText(getApplicationContext(), "Bye!", Toast.LENGTH_LONG).show();
             this.finish();
             System.exit(0);
+        } else if (id == R.id.nav_ack ) {
+            showAlert("Acknowledgements:", "Maureen Engel and others");
         }
 
 
@@ -1080,4 +1082,19 @@ public class MapActivity extends AppCompatActivity implements
 
         return x > pX;
     }
+
+    private void showAlert(String title, String body){
+        AlertDialog alertDialog = new AlertDialog.Builder(MapActivity.this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(body);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Ok",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+
+    }
+
 }
