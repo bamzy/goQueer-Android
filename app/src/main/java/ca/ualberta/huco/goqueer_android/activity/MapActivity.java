@@ -1013,7 +1013,7 @@ public class MapActivity extends AppCompatActivity implements
         if (qGallery != null && qGallery.getMedias().size()>0){
             galleryThumbnailLayout.setVisibility(View.VISIBLE);
             Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + qGallery.getMedias().get(0).getId()).into(galleryThumbnail);
-            galleryThumbnailLayout.setBackgroundColor(Color.GRAY);
+            galleryThumbnailLayout.setBackgroundColor(Color.DKGRAY);
             galleryTitle.setText(qGallery.getName());
             closeButton.setVisibility(View.VISIBLE);
 
