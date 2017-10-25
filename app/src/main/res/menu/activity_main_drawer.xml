@@ -10,7 +10,7 @@
         <item
             android:id="@+id/nav_setLocation"
             android:icon="@drawable/ic_location_set"
-            android:title="Set Location" />
+            android:title="Set City" />
         <item
             android:id="@+id/nav_gallery"
             android:enabled="false"
