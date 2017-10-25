@@ -83,12 +83,14 @@ import ca.ualberta.huco.goqueer_android.network.VolleyMyCoordinatesCallback;
 import ca.ualberta.huco.goqueer_android.network.VolleyMyGalleriesCallback;
 import ca.ualberta.huco.goqueer_android.network.VolleyMyGalleryInfoCallback;
 import ca.ualberta.huco.goqueer_android.network.VolleyMyHintCallback;
+import ca.ualberta.huco.goqueer_android.network.VolleyMyProfileCallback;
 import ca.ualberta.huco.goqueer_android.network.VolleySetDiscoveryCallback;
 import entity.Coordinate;
 import entity.QGallery;
 import entity.QLocation;
 import entity.QCoordinate;
 import entity.QMedia;
+import entity.QProfile;
 
 
 public class MapActivity extends AppCompatActivity implements
@@ -692,30 +694,102 @@ public class MapActivity extends AppCompatActivity implements
 
 
 
+    final LatLng[] initialCameraLocation = {new LatLng(50.557811408, -108.46774101257326)};
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        if ("".equalsIgnoreCase(getDefinedLocation()) || getDefinedLocation()==null ) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Enter the city name");
 
-        final LatLng testLocation =  new LatLng(53.557811408, -113.46774101257326);
+            final EditText input = new EditText(this);
+            input.setInputType(InputType.TYPE_CLASS_TEXT );
+            if (!"".equals(getDefinedLocation()))
+                input.setText(getDefinedLocation());
+            builder.setView(input);
+
+            builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    inputText = input.getText().toString();
+                    SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("locationName", inputText);
+                    editor.commit();
+                    queerClient.getAllProfiles(new VolleyMyProfileCallback() {
+                        @Override
+                        public void onSuccess(QProfile[] profiles) {
+                            for (QProfile profile: profiles)
+                                if (profile.getName().equalsIgnoreCase(inputText))
+                                    if (profile.getCoordinateLatLng()!= null)
+                                    initialCameraLocation[0] = profile.getCoordinateLatLng();
+                            final CameraPosition cameraPosition = new CameraPosition.Builder()
+                                    .target(initialCameraLocation[0])      // Sets the center of the map to location user
+                                    .zoom(11)                   // Sets the zoom
+                                    .bearing(0)                // Sets the orientation of the camera to east
+                                    .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                                    .build();                   // Creates a CameraPosition from the builder
+                            final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                                }
+                            }, 4000);
+                        }
+
+                        @Override
+                        public void onError(VolleyError result) {
+
+                        }
+                    });
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
+        } else {
+
+            queerClient.getAllProfiles(new VolleyMyProfileCallback() {
+                @Override
+                public void onSuccess(QProfile[] profiles) {
+                    for (QProfile profile: profiles)
+                        if (profile.getName().equalsIgnoreCase(getDefinedLocation()))
+                            if (profile.getCoordinateLatLng()!= null)
+                                initialCameraLocation[0] = profile.getCoordinateLatLng();
+                    final CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(initialCameraLocation[0])      // Sets the center of the map to location user
+                            .zoom(11)                   // Sets the zoom
+                            .bearing(0)                // Sets the orientation of the camera to east
+                            .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                            .build();                   // Creates a CameraPosition from the builder
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                        }
+                    }, 4000);
+                }
+
+                @Override
+                public void onError(VolleyError result) {
+
+                }
+            });
+
+        }
 
 
-        final CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(testLocation)      // Sets the center of the map to location user
-                .zoom(11)                   // Sets the zoom
-                .bearing(0)                // Sets the orientation of the camera to east
-                .tilt(40)                   // Sets the tilt of the camera to 30 degrees
-                .build();                   // Creates a CameraPosition from the builder
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-//                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(testLocation, 13));
-            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-            }
-        }, 4000);
 
-        
+
+
 
         MapStyleOptions style;
         style = MapStyleOptions.loadRawResourceStyle(this, R.raw.mapstyle_grayscale);
@@ -931,6 +1005,33 @@ public class MapActivity extends AppCompatActivity implements
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("locationName", inputText);
                     editor.commit();
+                    queerClient.getAllProfiles(new VolleyMyProfileCallback() {
+                        @Override
+                        public void onSuccess(QProfile[] profiles) {
+                            for (QProfile profile: profiles)
+                                if (profile.getName().equalsIgnoreCase(inputText))
+                                    if (profile.getCoordinateLatLng()!= null)
+                                        initialCameraLocation[0] = profile.getCoordinateLatLng();
+                            final CameraPosition cameraPosition = new CameraPosition.Builder()
+                                    .target(initialCameraLocation[0])      // Sets the center of the map to location user
+                                    .zoom(11)                   // Sets the zoom
+                                    .bearing(0)                // Sets the orientation of the camera to east
+                                    .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                                    .build();                   // Creates a CameraPosition from the builder
+                            final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                                }
+                            }, 4000);
+                        }
+
+                        @Override
+                        public void onError(VolleyError result) {
+
+                        }
+                    });
                 }
             });
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

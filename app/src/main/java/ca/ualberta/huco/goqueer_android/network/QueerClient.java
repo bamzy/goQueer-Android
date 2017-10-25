@@ -21,6 +21,7 @@ import entity.QCoordinate;
 import entity.QGallery;
 import entity.QLocation;
 import entity.QMedia;
+import entity.QProfile;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -59,6 +60,33 @@ public class QueerClient {
 
                             }
                             volleyMyCoordinatesCallback.onSuccess(discoveredQLocations);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.w(Constants.LOG_TAG,error.getCause());
+            }
+        });
+        queue.add(stringRequest);
+    }
+
+
+
+    public void getAllProfiles(final VolleyMyProfileCallback volleyMyProfileCallback){
+        String myLocationsUrl = url + "/client/getAllProfiles";
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, myLocationsUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Gson gson = new Gson();
+                        if (response.length() !=0) {
+
+                            QProfile[] profile = gson.fromJson(response, QProfile[].class);
+                            if (profile.length>0)
+                                volleyMyProfileCallback.onSuccess(profile);
+                            else volleyMyProfileCallback.onSuccess(null);
+
                         }
                     }
                 }, new Response.ErrorListener() {

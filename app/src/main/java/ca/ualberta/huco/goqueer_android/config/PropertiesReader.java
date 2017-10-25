@@ -61,10 +61,7 @@ public class PropertiesReader {
         result.put(Constants.GRANT_TYPE, getMyProperty(Constants.GRANT_TYPE));
         result.put(Constants.GUEST_GRANT_TYPE, getMyProperty(Constants.GUEST_GRANT_TYPE));
         result.put(Constants.API_SERVER_URL, getMyProperty(Constants.API_SERVER_URL));
-        result.put(Constants.UOFA_GENERAL_EMERGENCY_PHONE_NUMBER, getMyProperty(Constants.UOFA_GENERAL_EMERGENCY_PHONE_NUMBER));
-        result.put(Constants.UOFA_SECURITY_ISSUE_PHONE_NUMBER, getMyProperty(Constants.UOFA_SECURITY_ISSUE_PHONE_NUMBER));
-        result.put(Constants.UOFA_EMERGENCY_TEST_URL, getMyProperty(Constants.UOFA_EMERGENCY_TEST_URL));
-        result.put(Constants.UOFA_EMERGENCY_URL, getMyProperty(Constants.UOFA_EMERGENCY_URL));
+
         return result;
     }
 }
