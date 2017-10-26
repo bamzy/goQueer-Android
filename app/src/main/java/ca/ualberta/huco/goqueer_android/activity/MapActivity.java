@@ -7,6 +7,7 @@ package ca.ualberta.huco.goqueer_android.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,9 +17,9 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -28,16 +29,17 @@ import android.support.v7.app.ActionBarDrawerToggle;
 
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -91,6 +93,8 @@ import entity.QLocation;
 import entity.QCoordinate;
 import entity.QMedia;
 import entity.QProfile;
+
+import static ca.ualberta.huco.goqueer_android.R.menu.activity_main_drawer;
 
 
 public class MapActivity extends AppCompatActivity implements
@@ -149,6 +153,7 @@ public class MapActivity extends AppCompatActivity implements
     private TextView galleryTitle;
     private static SharedPreferences sharedPreferences;
     private QLocation[] discoveredLocations;
+    private QProfile[] allProfiles;
     private List<QGallery> myGalleries = new CopyOnWriteArrayList<QGallery>();
     private ArrayList<QLocation> allLocations;
     private ArrayList<Marker> discoveredMarkers;
@@ -178,6 +183,7 @@ public class MapActivity extends AppCompatActivity implements
 
         discoveredMarkers = new ArrayList<>();
         discoveredPolygons = new ArrayList<>();
+
 
 
          sharedPreferences = getPreferences(MODE_PRIVATE);
@@ -691,7 +697,56 @@ public class MapActivity extends AppCompatActivity implements
 
 
 
+    private void showRadioButtonDialog(QProfile[] profiles) {
 
+        // custom dialog
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.radiobutton_dialog);
+        List<String> stringList=new ArrayList<>();  // here is list
+        for(QProfile profile: profiles) {
+            stringList.add(profile.getName());
+        }
+        RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.radio_group);
+
+        for(int i=0;i<stringList.size();i++){
+            RadioButton rb=new RadioButton(this); // dynamically creating RadioButton and adding to RadioGroup.
+            rb.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    inputText =  ((RadioButton)v).getText().toString();
+                    SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("locationName", inputText);
+                    editor.commit();
+                    dialog.dismiss();
+                    for (QProfile profile: allProfiles)
+                        if (profile.getName().equalsIgnoreCase(inputText))
+                            if (profile.getCoordinateLatLng()!= null)
+                                initialCameraLocation[0] = profile.getCoordinateLatLng();
+                    final CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(initialCameraLocation[0])      // Sets the center of the map to location user
+                            .zoom(11)                   // Sets the zoom
+                            .bearing(0)                // Sets the orientation of the camera to east
+                            .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                            .build();                   // Creates a CameraPosition from the builder
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                        }
+                    }, 4000);
+                }
+            });
+            rb.setText(stringList.get(i));
+            rg.addView(rb);
+        }
+
+        dialog.show();
+
+    }
 
 
     final LatLng[] initialCameraLocation = {new LatLng(50.557811408, -108.46774101257326)};
@@ -699,43 +754,13 @@ public class MapActivity extends AppCompatActivity implements
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         if ("".equalsIgnoreCase(getDefinedLocation()) || getDefinedLocation()==null ) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Enter the city name");
 
-            final EditText input = new EditText(this);
-            input.setInputType(InputType.TYPE_CLASS_TEXT );
-            if (!"".equals(getDefinedLocation()))
-                input.setText(getDefinedLocation());
-            builder.setView(input);
-
-            builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    inputText = input.getText().toString();
-                    SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("locationName", inputText);
-                    editor.commit();
                     queerClient.getAllProfiles(new VolleyMyProfileCallback() {
                         @Override
                         public void onSuccess(QProfile[] profiles) {
-                            for (QProfile profile: profiles)
-                                if (profile.getName().equalsIgnoreCase(inputText))
-                                    if (profile.getCoordinateLatLng()!= null)
-                                    initialCameraLocation[0] = profile.getCoordinateLatLng();
-                            final CameraPosition cameraPosition = new CameraPosition.Builder()
-                                    .target(initialCameraLocation[0])      // Sets the center of the map to location user
-                                    .zoom(11)                   // Sets the zoom
-                                    .bearing(0)                // Sets the orientation of the camera to east
-                                    .tilt(40)                   // Sets the tilt of the camera to 30 degrees
-                                    .build();                   // Creates a CameraPosition from the builder
-                            final Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                                }
-                            }, 4000);
+                            allProfiles = profiles;
+                            showRadioButtonDialog(profiles);
+
                         }
 
                         @Override
@@ -743,16 +768,6 @@ public class MapActivity extends AppCompatActivity implements
 
                         }
                     });
-                }
-            });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-
-            builder.show();
         } else {
 
             queerClient.getAllProfiles(new VolleyMyProfileCallback() {
@@ -869,6 +884,8 @@ public class MapActivity extends AppCompatActivity implements
         }, delay, period);
     }
 
+
+
     private void pullMyGalleries(final QLocation[] locations) {
 
         for (QLocation location : locations) {
@@ -972,9 +989,9 @@ public class MapActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
+
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -986,62 +1003,21 @@ public class MapActivity extends AppCompatActivity implements
 
         } else if (id == R.id.nav_slideshow) {
 
-        } else if (id == R.id.nav_setLocation) {
+        } else if (id == R.id.nav_setCity) {
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Enter the city name");
-
-            final EditText input = new EditText(this);
-            input.setInputType(InputType.TYPE_CLASS_TEXT );
-            if (!"".equals(getDefinedLocation()))
-                input.setText(getDefinedLocation());
-            builder.setView(input);
-
-            builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+            queerClient.getAllProfiles(new VolleyMyProfileCallback() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    inputText = input.getText().toString();
-                    SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("locationName", inputText);
-                    editor.commit();
-                    queerClient.getAllProfiles(new VolleyMyProfileCallback() {
-                        @Override
-                        public void onSuccess(QProfile[] profiles) {
-                            for (QProfile profile: profiles)
-                                if (profile.getName().equalsIgnoreCase(inputText))
-                                    if (profile.getCoordinateLatLng()!= null)
-                                        initialCameraLocation[0] = profile.getCoordinateLatLng();
-                            final CameraPosition cameraPosition = new CameraPosition.Builder()
-                                    .target(initialCameraLocation[0])      // Sets the center of the map to location user
-                                    .zoom(11)                   // Sets the zoom
-                                    .bearing(0)                // Sets the orientation of the camera to east
-                                    .tilt(40)                   // Sets the tilt of the camera to 30 degrees
-                                    .build();                   // Creates a CameraPosition from the builder
-                            final Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                                }
-                            }, 4000);
-                        }
+                public void onSuccess(QProfile[] profiles) {
+                    allProfiles = profiles;
+                    showRadioButtonDialog(profiles);
 
-                        @Override
-                        public void onError(VolleyError result) {
+                }
 
-                        }
-                    });
+                @Override
+                public void onError(VolleyError result) {
+
                 }
             });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-
-            builder.show();
 
         } else if (id == R.id.nav_manage) {
 

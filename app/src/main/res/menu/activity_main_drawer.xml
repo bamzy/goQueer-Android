@@ -8,7 +8,7 @@
             android:icon="@drawable/ic_menu_set"
             android:title="Set" />
         <item
-            android:id="@+id/nav_setLocation"
+            android:id="@+id/nav_setCity"
             android:icon="@drawable/ic_location_set"
             android:title="Set City" />
         <item
