@@ -10,7 +10,7 @@
     android:paddingRight="@dimen/map_fragment_horizontal_margin"
     android:paddingTop="@dimen/map_fragment_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="ca.ualberta.huco.goqueer_android.activity.MapActivity"
+    tools:context=".activity.MapActivity"
     tools:showIn="@layout/activity_map"
     android:orientation="vertical">
 

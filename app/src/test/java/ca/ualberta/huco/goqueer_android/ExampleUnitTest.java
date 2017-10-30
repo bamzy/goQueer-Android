@@ -1,4 +1,4 @@
-package ca.ualberta.huco.goqueer_android;
+package ca.ualberta.goqueer;
 
 import org.junit.Test;
 
