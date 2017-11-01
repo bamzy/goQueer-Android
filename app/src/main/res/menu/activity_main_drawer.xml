@@ -53,6 +53,12 @@
                 android:id="@+id/nav_exit"
                 android:icon="@drawable/ic_close_dark"
                 android:title="Exit" />
+
+            <item
+                android:id="@+id/nav_deviceID"
+                android:enabled="true"
+                android:title="What's my ID?" />
+
         </menu>
     </item>
 

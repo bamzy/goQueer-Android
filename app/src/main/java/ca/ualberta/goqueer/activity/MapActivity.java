@@ -8,6 +8,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,6 +20,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -95,6 +97,7 @@ import entity.QMedia;
 import entity.QProfile;
 
 
+
 public class MapActivity extends AppCompatActivity implements
         OnMapReadyCallback,
         NavigationView.OnNavigationItemSelectedListener,
@@ -159,6 +162,7 @@ public class MapActivity extends AppCompatActivity implements
     private Marker myMarker;
     private LinearLayout galleryThumbnailLayout;
     private LinearLayout galleryTitleBackground;
+    private ClipData.Item deviceIdContent;
     private Button closeButton;
     private QueerClient queerClient;
     private int mStyleIds[] = {
@@ -1045,8 +1049,13 @@ public class MapActivity extends AppCompatActivity implements
             this.finish();
             System.exit(0);
         } else if (id == R.id.nav_ack ) {
-            showAlert("Acknowledgements:", "Maureen Engel and others");
+            showAlert("Acknowledgements:", "This project wouldn’t have begun were it not for the fabulous work of Darrin Hagen and his Queer History Bus Tour, and his book “The Edmonton Queen (Not a Riverboat Story).  I’m also deeply grateful for the support of Alvin Schrader and the Edmonton Queer History Project.  But mostly I want to thank acknowledge the best group of grad students anyone could hope for: Bamdad Aghilidehkordi, Kaitlyn Clafin, Kris Joseph, Kathleen Oliver, Michaela Stang, and Nailisa Tanner.  You folks are amazing.\n");
+        } else if (id == R.id.nav_deviceID) {
+            showAlert("Your ID:",Settings.Secure.getString(getApplicationContext().getContentResolver(),
+                    Settings.Secure.ANDROID_ID).substring(0,10));
+
         }
+
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.map_drawer_layout);
