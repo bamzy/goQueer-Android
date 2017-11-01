@@ -158,6 +158,7 @@ public class MapActivity extends AppCompatActivity implements
     private ArrayList<Polygon> discoveredPolygons;
     private Marker myMarker;
     private LinearLayout galleryThumbnailLayout;
+    private LinearLayout galleryTitleBackground;
     private Button closeButton;
     private QueerClient queerClient;
     private int mStyleIds[] = {
@@ -201,6 +202,7 @@ public class MapActivity extends AppCompatActivity implements
         galleryThumbnail = (ImageView) findViewById(R.id.galleryThumbnail);
         galleryTitle = (TextView) findViewById(R.id.galleryTitle);
         galleryThumbnailLayout = (LinearLayout) findViewById(R.id.galleryThumbnailLayout);
+        galleryTitleBackground = (LinearLayout) findViewById(R.id.titleLayoutBackground);
         closeButton = (Button) findViewById(R.id.closeButton);
 //        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -498,7 +500,7 @@ public class MapActivity extends AppCompatActivity implements
                 Location associatedLocation = new Location("");
                 associatedLocation.setLatitude(allLocation.getQCoordinates().getCoordinates().get(0).getLat());
                 associatedLocation.setLongitude(allLocation.getQCoordinates().getCoordinates().get(0).getLon());
-                if (associatedLocation.distanceTo(location) < 50 && !alreadyDiscovered(allLocation)) {
+                if (associatedLocation.distanceTo(location) < 10 && !alreadyDiscovered(allLocation)) {
                     queerClient.setDiscoveryStatus(new VolleySetDiscoveryCallback() {
                         @Override
                         public void onSuccess(boolean status) {
@@ -1088,15 +1090,19 @@ public class MapActivity extends AppCompatActivity implements
         if (qGallery != null && qGallery.getMedias().size()>0){
             galleryThumbnailLayout.setVisibility(View.VISIBLE);
             Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + qGallery.getMedias().get(0).getId()).into(galleryThumbnail);
-            galleryThumbnailLayout.setBackgroundColor(Color.DKGRAY);
+            galleryThumbnailLayout.setBackgroundColor(
+                    getApplicationContext().getResources().getColor(R.color.goqueer_primary_background));
             galleryTitle.setText(qGallery.getName());
+            galleryTitle.setBackgroundColor(getApplicationContext().getResources().getColor(R.color.uofa_white_transparent));
             closeButton.setVisibility(View.VISIBLE);
+            galleryTitleBackground.setVisibility(View.VISIBLE);
 
         }
         closeButton.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View view){
                 galleryThumbnailLayout.setVisibility(View.GONE);
+                galleryTitleBackground.setVisibility(View.GONE);
                 closeButton.setVisibility(View.GONE);
             }
         });
