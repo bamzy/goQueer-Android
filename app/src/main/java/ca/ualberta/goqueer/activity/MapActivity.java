@@ -164,6 +164,7 @@ public class MapActivity extends AppCompatActivity implements
     private LinearLayout galleryTitleBackground;
     private ClipData.Item deviceIdContent;
     private Button closeButton;
+    private TextView galleryThumnailText;
     private QueerClient queerClient;
     private int mStyleIds[] = {
             R.string.style_label_retro,
@@ -208,6 +209,7 @@ public class MapActivity extends AppCompatActivity implements
         galleryThumbnailLayout = (LinearLayout) findViewById(R.id.galleryThumbnailLayout);
         galleryTitleBackground = (LinearLayout) findViewById(R.id.titleLayoutBackground);
         closeButton = (Button) findViewById(R.id.closeButton);
+        galleryThumnailText = (TextView) findViewById(R.id.galleryThumbnailText);
 //        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 
@@ -1104,6 +1106,8 @@ public class MapActivity extends AppCompatActivity implements
             galleryTitle.setText(qGallery.getName());
             galleryTitle.setBackgroundColor(getApplicationContext().getResources().getColor(R.color.uofa_white_transparent));
             closeButton.setVisibility(View.VISIBLE);
+            galleryThumnailText.setVisibility(View.VISIBLE);
+            galleryThumnailText.setText(marker.getSnippet());
             galleryTitleBackground.setVisibility(View.VISIBLE);
 
         }
@@ -1113,6 +1117,7 @@ public class MapActivity extends AppCompatActivity implements
                 galleryThumbnailLayout.setVisibility(View.GONE);
                 galleryTitleBackground.setVisibility(View.GONE);
                 closeButton.setVisibility(View.GONE);
+                galleryThumnailText.setVisibility(View.GONE);
             }
         });
         galleryThumbnail.setOnClickListener(new View.OnClickListener() {
