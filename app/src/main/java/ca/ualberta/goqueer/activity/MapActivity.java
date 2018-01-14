@@ -64,6 +64,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -858,18 +859,27 @@ public class MapActivity extends AppCompatActivity implements
                             } else if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POLYGON){
                                 PolygonOptions polygonOptions = new PolygonOptions();
                                 LatLng temp = new LatLng(0,0);
+                                ArrayList<LatLng> cornerList = new ArrayList<>();
                                 for (Coordinate coordinate1 : queerLocation.getQCoordinates().getCoordinates()) {
                                     temp = new LatLng(coordinate1.getLat(),coordinate1.getLon());
                                     polygonOptions.add(temp);
-                                    discoveredMarkers.add(mMap.addMarker(new MarkerOptions()
-                                                    .position(temp)
+//                                    discoveredMarkers.add(mMap.addMarker(new MarkerOptions()
+//                                                    .position(temp)
+//                                                    .title(queerLocation.getName())
+//                                                    .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
+//                                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin2))
+//                                    ));
+                                    cornerList.add(temp);
+                                }
+                                LatLng center = getPolygonCenterPoint(cornerList);
+                                discoveredMarkers.add(mMap.addMarker(new MarkerOptions()
+                                                    .position(center)
                                                     .title(queerLocation.getName())
                                                     .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
                                                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin2))
                                     ));
-                                }
 
-                                discoveredPolygons.add(mMap.addPolygon(polygonOptions.fillColor(Color.GREEN)));
+                                discoveredPolygons.add(mMap.addPolygon(polygonOptions.fillColor(Color.argb(59,77, 78, 79))));
                             }
                         }
 
@@ -890,6 +900,18 @@ public class MapActivity extends AppCompatActivity implements
         }, delay, period);
     }
 
+    private LatLng getPolygonCenterPoint(ArrayList<LatLng> polygonPointsList){
+        LatLng centerLatLng = null;
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for(int i = 0 ; i < polygonPointsList.size() ; i++)
+        {
+            builder.include(polygonPointsList.get(i));
+        }
+        LatLngBounds bounds = builder.build();
+        centerLatLng =  bounds.getCenter();
+
+        return centerLatLng;
+    }
 
 
     private void pullMyGalleries(final QLocation[] locations) {

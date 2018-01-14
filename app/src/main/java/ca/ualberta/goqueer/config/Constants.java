@@ -15,9 +15,9 @@ public class Constants {
     public static final String PREFERENCES_NAME = "MyUalbertaPrefs";
     public static final String LOG_TAG = "goqueer";
 //    public static final String GO_QUEER_BASE_SERVER_URL = "http://192.168.226.2:8000/";
-//    public static final String GO_QUEER_BASE_SERVER_URL = "http://192.168.42.2:8000/";
+    public static final String GO_QUEER_BASE_SERVER_URL = "http://192.168.65.2:8000/";
 //    public static final String GO_QUEER_BASE_SERVER_URL = "http://192.168.56.1:8000/";
-    public static final String GO_QUEER_BASE_SERVER_URL = "http://206.167.180.114:80/";
+//    public static final String GO_QUEER_BASE_SERVER_URL = "http://206.167.180.114:80/";
     public static final String OAUTH_LOGIN_SERVER_URL = "oauthTokenServerUrl";
     public static final String OAUTH_TOKEN_SERVER_URL = "oauthTokenServerUrl";
     public static final String OAUTH_TOKEN_LOGOUT_URL = "oauthTokenLogoutUrl";
