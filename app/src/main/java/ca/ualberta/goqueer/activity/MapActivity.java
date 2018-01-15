@@ -725,13 +725,20 @@ public class MapActivity extends AppCompatActivity implements
                     inputText =  ((RadioButton)v).getText().toString();
                     SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("locationName", inputText);
+                    editor.putString("profileName", inputText);
                     editor.commit();
                     dialog.dismiss();
                     for (QProfile profile: allProfiles)
-                        if (profile.getName().equalsIgnoreCase(inputText))
-                            if (profile.getCoordinateLatLng()!= null)
+                        if (profile.getName().equalsIgnoreCase(inputText)) {
+                            editor.putString("profileType", profile.getShow());
+                            editor.putString("profileLat", profile.getLat());
+                            editor.putString("profileLng", profile.getLng());
+                            editor.putLong("profileID", profile.getId());
+                            editor.commit();
+                            if (profile.getCoordinateLatLng() != null) {
                                 initialCameraLocation[0] = profile.getCoordinateLatLng();
+                            }
+                        }
                     final CameraPosition cameraPosition = new CameraPosition.Builder()
                             .target(initialCameraLocation[0])      // Sets the center of the map to location user
                             .zoom(11)                   // Sets the zoom
@@ -760,7 +767,7 @@ public class MapActivity extends AppCompatActivity implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        if ("".equalsIgnoreCase(getDefinedLocation()) || getDefinedLocation()==null ) {
+        if ("".equalsIgnoreCase(getDefinedLocation().getName()) || getDefinedLocation()==null ) {
 
                     queerClient.getAllProfiles(new VolleyMyProfileCallback() {
                         @Override
@@ -780,15 +787,21 @@ public class MapActivity extends AppCompatActivity implements
             queerClient.getAllProfiles(new VolleyMyProfileCallback() {
                 @Override
                 public void onSuccess(QProfile[] profiles) {
+                    float zoom = 11,tilt = 40 ,bearing = 0;
                     for (QProfile profile: profiles)
-                        if (profile.getName().equalsIgnoreCase(getDefinedLocation()))
-                            if (profile.getCoordinateLatLng()!= null)
+                        if (profile.getName().equalsIgnoreCase(getDefinedLocation().getName()))
+                            if (profile.getCoordinateLatLng()!= null) {
                                 initialCameraLocation[0] = profile.getCoordinateLatLng();
+                                zoom = profile.getZoom();
+                                tilt = profile.getTilt();
+                                bearing = profile.getBearing();
+
+                            }
                     final CameraPosition cameraPosition = new CameraPosition.Builder()
                             .target(initialCameraLocation[0])      // Sets the center of the map to location user
-                            .zoom(11)                   // Sets the zoom
-                            .bearing(0)                // Sets the orientation of the camera to east
-                            .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                            .zoom(zoom)                   // Sets the zoom
+                            .bearing(bearing)                // Sets the orientation of the camera to east
+                            .tilt(tilt)                   // Sets the tilt of the camera to 30 degrees
                             .build();                   // Creates a CameraPosition from the builder
                     final Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
@@ -834,70 +847,77 @@ public class MapActivity extends AppCompatActivity implements
         timer.scheduleAtFixedRate(new TimerTask() {
 
             public void run() {
-                queerClient.getMyLocations(new VolleyMyCoordinatesCallback() {
-                    @Override
-                    public void onSuccess(QLocation[] queerLocations) {
-                        for (Marker marker : discoveredMarkers) {
-                            marker.remove();
-                        }
-                        for (Polygon marker : discoveredPolygons) {
-                            marker.remove();
-                        }
-                        discoveredLocations= null;
-                        discoveredLocations = queerLocations;
+                if (getDefinedLocation().getShow().equals("0") ) {
+                    queerClient.getMyLocations(new VolleyMyCoordinatesCallback() {
+                        @Override
+                        public void onSuccess(QLocation[] queerLocations) {
+                            for (Marker marker : discoveredMarkers) {
+                                marker.remove();
+                            }
+                            for (Polygon marker : discoveredPolygons) {
+                                marker.remove();
+                            }
+                            discoveredLocations = null;
+                            discoveredLocations = queerLocations;
 
-                        for (QLocation queerLocation : discoveredLocations) {
-                            if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POINT) {
-                                Coordinate latlog = queerLocation.getQCoordinates().getCoordinates().get(0);
-                                LatLng testLocation4 =  new LatLng(latlog.getLat(), latlog.getLon());
+                            processReceivedLocations();
+                        }
 
-                                discoveredMarkers.add(mMap.addMarker(new MarkerOptions()
-                                        .position(testLocation4)
-                                        .title(queerLocation.getName())
-                                        .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin5))));
-                            } else if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POLYGON){
-                                PolygonOptions polygonOptions = new PolygonOptions();
-                                LatLng temp = new LatLng(0,0);
-                                ArrayList<LatLng> cornerList = new ArrayList<>();
-                                for (Coordinate coordinate1 : queerLocation.getQCoordinates().getCoordinates()) {
-                                    temp = new LatLng(coordinate1.getLat(),coordinate1.getLon());
-                                    polygonOptions.add(temp);
+                        @Override
+                        public void onError(VolleyError result) {
+
+                        }
+                    }, getDefinedLocation());
+                } else ()
+
+
+            }
+
+        }, delay, period);
+    }
+
+    private void processReceivedLocations() {
+        for (QLocation queerLocation : discoveredLocations) {
+            if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POINT) {
+                Coordinate latlog = queerLocation.getQCoordinates().getCoordinates().get(0);
+                LatLng testLocation4 =  new LatLng(latlog.getLat(), latlog.getLon());
+
+                discoveredMarkers.add(mMap.addMarker(new MarkerOptions()
+                        .position(testLocation4)
+                        .zIndex(queerLocation.getId())
+                        .title(queerLocation.getName())
+                        .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin5))));
+            } else if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POLYGON){
+                PolygonOptions polygonOptions = new PolygonOptions();
+                LatLng temp = new LatLng(0,0);
+                ArrayList<LatLng> cornerList = new ArrayList<>();
+                for (Coordinate coordinate1 : queerLocation.getQCoordinates().getCoordinates()) {
+                    temp = new LatLng(coordinate1.getLat(),coordinate1.getLon());
+                    polygonOptions.add(temp);
 //                                    discoveredMarkers.add(mMap.addMarker(new MarkerOptions()
 //                                                    .position(temp)
 //                                                    .title(queerLocation.getName())
 //                                                    .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
 //                                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin2))
 //                                    ));
-                                    cornerList.add(temp);
-                                }
-                                LatLng center = getPolygonCenterPoint(cornerList);
-                                discoveredMarkers.add(mMap.addMarker(new MarkerOptions()
-                                                    .position(center)
-                                                    .title(queerLocation.getName())
-                                                    .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
-                                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin2))
-                                    ));
+                    cornerList.add(temp);
+                }
+                LatLng center = getPolygonCenterPoint(cornerList);
+                discoveredMarkers.add(mMap.addMarker(new MarkerOptions()
+                                    .position(center)
+                                    .title(queerLocation.getName())
+                                    .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin2))
+                    ));
 
-                                discoveredPolygons.add(mMap.addPolygon(polygonOptions.fillColor(Color.argb(59,77, 78, 79))));
-                            }
-                        }
-
-                        Log.w(Constants.LOG_TAG,"Getting My Location Repeated");
-                        pullMyGalleries(discoveredLocations);
-                        pullAllLocations();
-                    }
-
-                    @Override
-                    public void onError(VolleyError result) {
-
-                    }
-                },getDefinedLocation());
-
-
+                discoveredPolygons.add(mMap.addPolygon(polygonOptions.fillColor(Color.argb(59,77, 78, 79))));
             }
+        }
 
-        }, delay, period);
+        Log.w(Constants.LOG_TAG,"Getting My Location Repeated");
+        pullMyGalleries(discoveredLocations);
+        pullAllLocations();
     }
 
     private LatLng getPolygonCenterPoint(ArrayList<LatLng> polygonPointsList){
@@ -1087,11 +1107,15 @@ public class MapActivity extends AppCompatActivity implements
         return true;
     }
 
-    public static String getDefinedLocation() {
+    public static QProfile getDefinedLocation() {
 
-        if (sharedPreferences != null)
-        return    sharedPreferences.getString("locationName", null);
-
+        if (sharedPreferences != null) {
+            QProfile result = new QProfile();
+            result.setName(sharedPreferences.getString("profileName", null));
+            result.setShow(sharedPreferences.getString("profileType", null));
+            result.setId(sharedPreferences.getLong("profileID", 0));
+            return result;
+        }
         else return null;
     }
 
@@ -1120,17 +1144,37 @@ public class MapActivity extends AppCompatActivity implements
             marker.showInfoWindow();
         }
         final QGallery qGallery = findAssociatedGallery(marker);
+        final float selectedLocationId = marker.getZIndex();
         if (qGallery != null && qGallery.getMedias().size()>0){
-            galleryThumbnailLayout.setVisibility(View.VISIBLE);
-            Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + qGallery.getMedias().get(0).getId()).into(galleryThumbnail);
-            galleryThumbnailLayout.setBackgroundColor(
-                    getApplicationContext().getResources().getColor(R.color.goqueer_primary_background));
-            galleryTitle.setText(qGallery.getName());
-            galleryTitle.setBackgroundColor(getApplicationContext().getResources().getColor(R.color.uofa_white_transparent));
-            closeButton.setVisibility(View.VISIBLE);
-            galleryThumnailText.setVisibility(View.VISIBLE);
-            galleryThumnailText.setText(marker.getSnippet());
-            galleryTitleBackground.setVisibility(View.VISIBLE);
+            if (getDefinedLocation().getShow().equalsIgnoreCase("2")) {
+                for (QLocation discoveredLocation : discoveredLocations) {
+                    if (discoveredLocation.getId() ==(int) selectedLocationId) {
+                        galleryThumbnailLayout.setVisibility(View.VISIBLE);
+                        Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + qGallery.getMedias().get(0).getId()).into(galleryThumbnail);
+                        galleryThumbnailLayout.setBackgroundColor(
+                                getApplicationContext().getResources().getColor(R.color.goqueer_primary_background));
+                        galleryTitle.setText(qGallery.getName());
+                        galleryTitle.setBackgroundColor(getApplicationContext().getResources().getColor(R.color.uofa_white_transparent));
+                        closeButton.setVisibility(View.VISIBLE);
+                        galleryThumnailText.setVisibility(View.VISIBLE);
+                        galleryThumnailText.setText(marker.getSnippet());
+                        galleryTitleBackground.setVisibility(View.VISIBLE);
+                        return;
+                    }
+                }
+                Toast.makeText(getBaseContext(), "You Have To Discover This Location First!", Toast.LENGTH_SHORT).show();
+            } else {
+                galleryThumbnailLayout.setVisibility(View.VISIBLE);
+                Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + qGallery.getMedias().get(0).getId()).into(galleryThumbnail);
+                galleryThumbnailLayout.setBackgroundColor(
+                        getApplicationContext().getResources().getColor(R.color.goqueer_primary_background));
+                galleryTitle.setText(qGallery.getName());
+                galleryTitle.setBackgroundColor(getApplicationContext().getResources().getColor(R.color.uofa_white_transparent));
+                closeButton.setVisibility(View.VISIBLE);
+                galleryThumnailText.setVisibility(View.VISIBLE);
+                galleryThumnailText.setText(marker.getSnippet());
+                galleryTitleBackground.setVisibility(View.VISIBLE);
+            }
 
         }
         closeButton.setOnClickListener(new Button.OnClickListener(){
@@ -1145,7 +1189,8 @@ public class MapActivity extends AppCompatActivity implements
         galleryThumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                navigateToGalleryActivity(qGallery);
+
+                    navigateToGalleryActivity(qGallery);
             }
         });
 
