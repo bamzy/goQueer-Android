@@ -13,6 +13,16 @@ public class QLocation {
     private String description;
     private String address;
     private long gallery_id;
+
+    public String getData_display_mode() {
+        return data_display_mode;
+    }
+
+    public void setData_display_mode(String data_display_mode) {
+        this.data_display_mode = data_display_mode;
+    }
+
+    private String data_display_mode;
     private QCoordinate coordinates;
     public long getId() {
         return id;

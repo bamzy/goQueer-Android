@@ -155,6 +155,7 @@ public class MapActivity extends AppCompatActivity implements
     private TextView galleryTitle;
     private static SharedPreferences sharedPreferences;
     private QLocation[] discoveredLocations;
+    private QLocation[] realDiscoveredLocations;
     private QProfile[] allProfiles;
     private List<QGallery> myGalleries = new CopyOnWriteArrayList<QGallery>();
     private ArrayList<QLocation> allLocations;
@@ -847,28 +848,65 @@ public class MapActivity extends AppCompatActivity implements
         timer.scheduleAtFixedRate(new TimerTask() {
 
             public void run() {
-                if (getDefinedLocation().getShow().equals("0") ) {
-                    queerClient.getMyLocations(new VolleyMyCoordinatesCallback() {
-                        @Override
-                        public void onSuccess(QLocation[] queerLocations) {
-                            for (Marker marker : discoveredMarkers) {
-                                marker.remove();
+                    if (getDefinedLocation().getShow().equalsIgnoreCase("0")) {
+                        queerClient.getMyLocations(new VolleyMyCoordinatesCallback() {
+                            @Override
+                            public void onSuccess(QLocation[] queerLocations) {
+                                for (Marker marker : discoveredMarkers) {
+                                    marker.remove();
+                                }
+                                for (Polygon marker : discoveredPolygons) {
+                                    marker.remove();
+                                }
+                                discoveredLocations = null;
+                                discoveredLocations = queerLocations;
+
+                                processReceivedLocations();
                             }
-                            for (Polygon marker : discoveredPolygons) {
-                                marker.remove();
+
+                            @Override
+                            public void onError(VolleyError result) {
+
                             }
-                            discoveredLocations = null;
-                            discoveredLocations = queerLocations;
+                        }, getDefinedLocation());
+                    } else if(getDefinedLocation().getShow().equalsIgnoreCase("1") || getDefinedLocation().getShow().equalsIgnoreCase( "2")) {
+                        queerClient.getAllLocations(new VolleyMyCoordinatesCallback() {
+                            @Override
+                            public void onSuccess(QLocation[] queerLocations) {
+                                for (Marker marker : discoveredMarkers) {
+                                    marker.remove();
+                                }
+                                for (Polygon marker : discoveredPolygons) {
+                                    marker.remove();
+                                }
+                                discoveredLocations = null;
+                                discoveredLocations = queerLocations;
 
-                            processReceivedLocations();
-                        }
+                                processReceivedLocations();
+                            }
 
-                        @Override
-                        public void onError(VolleyError result) {
+                            @Override
+                            public void onError(VolleyError result) {
 
-                        }
-                    }, getDefinedLocation());
-                } else ()
+                            }
+                        }, getDefinedLocation());
+
+                    }
+                    if (getDefinedLocation().getShow().equalsIgnoreCase("2")){
+                        queerClient.getMyLocations(new VolleyMyCoordinatesCallback() {
+                            @Override
+                            public void onSuccess(QLocation[] queerLocations) {
+
+                                realDiscoveredLocations = queerLocations;
+
+                            }
+
+                            @Override
+                            public void onError(VolleyError result) {
+
+                            }
+                        }, getDefinedLocation());
+                    }
 
 
             }
@@ -878,6 +916,7 @@ public class MapActivity extends AppCompatActivity implements
 
     private void processReceivedLocations() {
         for (QLocation queerLocation : discoveredLocations) {
+            queerLocation.setData_display_mode(getDefinedLocation().getShow());
             if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POINT) {
                 Coordinate latlog = queerLocation.getQCoordinates().getCoordinates().get(0);
                 LatLng testLocation4 =  new LatLng(latlog.getLat(), latlog.getLon());
@@ -895,17 +934,12 @@ public class MapActivity extends AppCompatActivity implements
                 for (Coordinate coordinate1 : queerLocation.getQCoordinates().getCoordinates()) {
                     temp = new LatLng(coordinate1.getLat(),coordinate1.getLon());
                     polygonOptions.add(temp);
-//                                    discoveredMarkers.add(mMap.addMarker(new MarkerOptions()
-//                                                    .position(temp)
-//                                                    .title(queerLocation.getName())
-//                                                    .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
-//                                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin2))
-//                                    ));
                     cornerList.add(temp);
                 }
                 LatLng center = getPolygonCenterPoint(cornerList);
                 discoveredMarkers.add(mMap.addMarker(new MarkerOptions()
                                     .position(center)
+                                    .zIndex(queerLocation.getId())
                                     .title(queerLocation.getName())
                                     .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
                                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin2))
@@ -1138,32 +1172,15 @@ public class MapActivity extends AppCompatActivity implements
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        if(marker.isInfoWindowShown()) {
+        if (marker.isInfoWindowShown()) {
             marker.hideInfoWindow();
         } else {
             marker.showInfoWindow();
         }
         final QGallery qGallery = findAssociatedGallery(marker);
-        final float selectedLocationId = marker.getZIndex();
-        if (qGallery != null && qGallery.getMedias().size()>0){
-            if (getDefinedLocation().getShow().equalsIgnoreCase("2")) {
-                for (QLocation discoveredLocation : discoveredLocations) {
-                    if (discoveredLocation.getId() ==(int) selectedLocationId) {
-                        galleryThumbnailLayout.setVisibility(View.VISIBLE);
-                        Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + qGallery.getMedias().get(0).getId()).into(galleryThumbnail);
-                        galleryThumbnailLayout.setBackgroundColor(
-                                getApplicationContext().getResources().getColor(R.color.goqueer_primary_background));
-                        galleryTitle.setText(qGallery.getName());
-                        galleryTitle.setBackgroundColor(getApplicationContext().getResources().getColor(R.color.uofa_white_transparent));
-                        closeButton.setVisibility(View.VISIBLE);
-                        galleryThumnailText.setVisibility(View.VISIBLE);
-                        galleryThumnailText.setText(marker.getSnippet());
-                        galleryTitleBackground.setVisibility(View.VISIBLE);
-                        return;
-                    }
-                }
-                Toast.makeText(getBaseContext(), "You Have To Discover This Location First!", Toast.LENGTH_SHORT).show();
-            } else {
+        if (getDefinedLocation().getShow().equalsIgnoreCase( "0") || getDefinedLocation().getShow().equalsIgnoreCase("1") || (hasBeenDiscovered((int)marker.getZIndex()) && getDefinedLocation().getShow().equalsIgnoreCase("2")) ) {
+            //{!! Form::select('show', array('0'=>'No', '1'=>'Yes','2'=> 'Only show pins, not the galleries'), null, ['class' => 'form-control']) !!}
+            if (qGallery != null && qGallery.getMedias().size() > 0) {
                 galleryThumbnailLayout.setVisibility(View.VISIBLE);
                 Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + qGallery.getMedias().get(0).getId()).into(galleryThumbnail);
                 galleryThumbnailLayout.setBackgroundColor(
@@ -1174,26 +1191,39 @@ public class MapActivity extends AppCompatActivity implements
                 galleryThumnailText.setVisibility(View.VISIBLE);
                 galleryThumnailText.setText(marker.getSnippet());
                 galleryTitleBackground.setVisibility(View.VISIBLE);
+                return;
             }
+            closeButton.setOnClickListener(new Button.OnClickListener(){
+                @Override
+                public void onClick(View view){
+                    galleryThumbnailLayout.setVisibility(View.GONE);
+                    galleryTitleBackground.setVisibility(View.GONE);
+                    closeButton.setVisibility(View.GONE);
+                    galleryThumnailText.setVisibility(View.GONE);
+                }
+            });
+            galleryThumbnail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                        navigateToGalleryActivity(qGallery);
+                }
+            });
+        } else if (getDefinedLocation().getShow() == "2") {
+            Toast.makeText(getBaseContext(), "You have not discovered this location yet!!", Toast.LENGTH_SHORT).show();
+        }
+
+
+
+
+    }
+    private boolean hasBeenDiscovered(int id) {
+        for (QLocation location : realDiscoveredLocations) {
+            if ((long)id == location.getId())
+                return true;
 
         }
-        closeButton.setOnClickListener(new Button.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                galleryThumbnailLayout.setVisibility(View.GONE);
-                galleryTitleBackground.setVisibility(View.GONE);
-                closeButton.setVisibility(View.GONE);
-                galleryThumnailText.setVisibility(View.GONE);
-            }
-        });
-        galleryThumbnail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                    navigateToGalleryActivity(qGallery);
-            }
-        });
-
+        return false;
     }
 
     private QGallery findAssociatedGallery(Marker marker) {
