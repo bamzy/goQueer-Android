@@ -1191,7 +1191,7 @@ public class MapActivity extends AppCompatActivity implements
                 galleryThumnailText.setVisibility(View.VISIBLE);
                 galleryThumnailText.setText(marker.getSnippet());
                 galleryTitleBackground.setVisibility(View.VISIBLE);
-                return;
+
             }
             closeButton.setOnClickListener(new Button.OnClickListener(){
                 @Override
@@ -1209,7 +1209,7 @@ public class MapActivity extends AppCompatActivity implements
                         navigateToGalleryActivity(qGallery);
                 }
             });
-        } else if (getDefinedLocation().getShow() == "2") {
+        } else if (getDefinedLocation().getShow().equalsIgnoreCase("2")) {
             Toast.makeText(getBaseContext(), "You have not discovered this location yet!!", Toast.LENGTH_SHORT).show();
         }
 
