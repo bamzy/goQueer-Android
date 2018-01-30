@@ -30,7 +30,9 @@ public class QProfile {
     }
 
     public String getShow() {
+        if (show!= null)
         return show;
+        else return "";
     }
 
     public void setId(long id) {

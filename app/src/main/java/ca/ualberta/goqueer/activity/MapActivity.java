@@ -848,6 +848,8 @@ public class MapActivity extends AppCompatActivity implements
         timer.scheduleAtFixedRate(new TimerTask() {
 
             public void run() {
+                    if (getDefinedLocation().getShow() == null)
+                        return;
                     if (getDefinedLocation().getShow().equalsIgnoreCase("0")) {
                         queerClient.getMyLocations(new VolleyMyCoordinatesCallback() {
                             @Override
@@ -1178,6 +1180,8 @@ public class MapActivity extends AppCompatActivity implements
             marker.showInfoWindow();
         }
         final QGallery qGallery = findAssociatedGallery(marker);
+        if (qGallery == null)
+            Toast.makeText(getBaseContext(), "No Associated Gallery Found!", Toast.LENGTH_SHORT).show();
         if (getDefinedLocation().getShow().equalsIgnoreCase( "0") || getDefinedLocation().getShow().equalsIgnoreCase("1") || (hasBeenDiscovered((int)marker.getZIndex()) && getDefinedLocation().getShow().equalsIgnoreCase("2")) ) {
             //{!! Form::select('show', array('0'=>'No', '1'=>'Yes','2'=> 'Only show pins, not the galleries'), null, ['class' => 'form-control']) !!}
             if (qGallery != null && qGallery.getMedias().size() > 0) {
