@@ -20,6 +20,17 @@ public class QProfile {
         return id;
     }
 
+    public void setZoom(float zoom) {
+        this.zoom = zoom;
+    }
+
+    public void setTilt(float tilt) {
+        this.tilt = tilt;
+    }
+
+    public void setBearing(float bearing) {
+        this.bearing = bearing;
+    }
 
     public String getLat() {
         return lat;

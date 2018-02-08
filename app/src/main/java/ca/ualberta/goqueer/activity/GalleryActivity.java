@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 
 import com.android.volley.VolleyError;
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 
 
@@ -125,7 +126,14 @@ public class GalleryActivity extends AppCompatActivity implements
             pageNumber.setText("(" +(currentIndex+1) + "/" + gallery.getMedias().size() + ")");
             mediaDescription.setText(gallery.getMedias().get(currentIndex).getDescription() );
             mediaDescription.setMovementMethod(new ScrollingMovementMethod());
-            Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id="+ gallery.getMedias().get(currentIndex).getId()).into(mainMediaImage);
+
+            if ("4".equalsIgnoreCase(gallery.getMedias().get(currentIndex).getType_id()))
+                Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id="+ gallery.getMedias().get(currentIndex).getId()).into(mainMediaImage);
+            if ("5".equalsIgnoreCase(gallery.getMedias().get(currentIndex).getType_id()))
+                Glide.with(getApplicationContext())
+                        .asGif()
+                        .load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + gallery.getMedias().get(currentIndex).getId())
+                        .into((ImageView) findViewById(R.id.mainMediaImage));
             mainMediaImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

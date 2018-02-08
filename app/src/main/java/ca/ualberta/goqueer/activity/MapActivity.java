@@ -46,6 +46,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
+import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -96,7 +97,6 @@ import entity.QLocation;
 import entity.QCoordinate;
 import entity.QMedia;
 import entity.QProfile;
-
 
 
 public class MapActivity extends AppCompatActivity implements
@@ -151,7 +151,7 @@ public class MapActivity extends AppCompatActivity implements
 
 
     private GoogleMap mMap;
-    private ImageView galleryThumbnail;
+    private ImageView galleryThumbnailImg;
     private TextView galleryTitle;
     private static SharedPreferences sharedPreferences;
     private QLocation[] discoveredLocations;
@@ -206,7 +206,7 @@ public class MapActivity extends AppCompatActivity implements
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         queerClient = new QueerClient(getApplicationContext());
-        galleryThumbnail = (ImageView) findViewById(R.id.galleryThumbnail);
+        galleryThumbnailImg = (ImageView) findViewById(R.id.galleryThumbnailImg);
         galleryTitle = (TextView) findViewById(R.id.galleryTitle);
         galleryThumbnailLayout = (LinearLayout) findViewById(R.id.galleryThumbnailLayout);
         galleryTitleBackground = (LinearLayout) findViewById(R.id.titleLayoutBackground);
@@ -722,7 +722,7 @@ public class MapActivity extends AppCompatActivity implements
             rb.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    float zoom = 11,tilt = 40 ,bearing = 0;
                     inputText =  ((RadioButton)v).getText().toString();
                     SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -734,7 +734,13 @@ public class MapActivity extends AppCompatActivity implements
                             editor.putString("profileType", profile.getShow());
                             editor.putString("profileLat", profile.getLat());
                             editor.putString("profileLng", profile.getLng());
+                            editor.putFloat("profileBearing", profile.getBearing());
+                            editor.putFloat("profileZoom", profile.getZoom());
+                            editor.putFloat("profileTilt", profile.getTilt());
                             editor.putLong("profileID", profile.getId());
+                            zoom = profile.getZoom();
+                            tilt = profile.getTilt();
+                            bearing = profile.getBearing();
                             editor.commit();
                             if (profile.getCoordinateLatLng() != null) {
                                 initialCameraLocation[0] = profile.getCoordinateLatLng();
@@ -742,9 +748,9 @@ public class MapActivity extends AppCompatActivity implements
                         }
                     final CameraPosition cameraPosition = new CameraPosition.Builder()
                             .target(initialCameraLocation[0])      // Sets the center of the map to location user
-                            .zoom(11)                   // Sets the zoom
-                            .bearing(0)                // Sets the orientation of the camera to east
-                            .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                            .zoom(zoom)                   // Sets the zoom
+                            .bearing(bearing)                // Sets the orientation of the camera to east
+                            .tilt(tilt)                   // Sets the tilt of the camera to 30 degrees
                             .build();                   // Creates a CameraPosition from the builder
                     final Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
@@ -765,6 +771,7 @@ public class MapActivity extends AppCompatActivity implements
 
 
     final LatLng[] initialCameraLocation = {new LatLng(50.557811408, -108.46774101257326)};
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -1150,6 +1157,9 @@ public class MapActivity extends AppCompatActivity implements
             result.setName(sharedPreferences.getString("profileName", null));
             result.setShow(sharedPreferences.getString("profileType", null));
             result.setId(sharedPreferences.getLong("profileID", 0));
+            result.setZoom(sharedPreferences.getFloat("profileZoom", 11));
+            result.setTilt(sharedPreferences.getFloat("profileTilt", 40));
+            result.setBearing(sharedPreferences.getFloat("profileBearing", 0));
             return result;
         }
         else return null;
@@ -1186,7 +1196,14 @@ public class MapActivity extends AppCompatActivity implements
             //{!! Form::select('show', array('0'=>'No', '1'=>'Yes','2'=> 'Only show pins, not the galleries'), null, ['class' => 'form-control']) !!}
             if (qGallery != null && qGallery.getMedias().size() > 0) {
                 galleryThumbnailLayout.setVisibility(View.VISIBLE);
-                Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + qGallery.getMedias().get(0).getId()).into(galleryThumbnail);
+                if ("4".equalsIgnoreCase(qGallery.getMedias().get(0).getType_id()))
+                    Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + qGallery.getMedias().get(0).getId()).into(galleryThumbnailImg);
+                else if ("5".equalsIgnoreCase(qGallery.getMedias().get(0).getType_id()))
+                    Glide.with(getApplicationContext())
+                        .asGif()
+                        .load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + qGallery.getMedias().get(0).getId())
+                        .into((ImageView) findViewById(R.id.galleryThumbnailImg));
+
                 galleryThumbnailLayout.setBackgroundColor(
                         getApplicationContext().getResources().getColor(R.color.goqueer_primary_background));
                 galleryTitle.setText(qGallery.getName());
@@ -1206,7 +1223,7 @@ public class MapActivity extends AppCompatActivity implements
                     galleryThumnailText.setVisibility(View.GONE);
                 }
             });
-            galleryThumbnail.setOnClickListener(new View.OnClickListener() {
+            galleryThumbnailImg.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 

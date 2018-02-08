@@ -11,7 +11,9 @@ public class QMedia {
     private String name;
     private String publish_date;
     private String display_date;
+    private String type_id;
 
+    public String getType_id() { return type_id; }
 
     public long getId() {
         return id;
