@@ -838,6 +838,8 @@ public class MapActivity extends AppCompatActivity implements
         style = MapStyleOptions.loadRawResourceStyle(this, R.raw.mapstyle_grayscale);
         mMap.setMapStyle(style);
         mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.setInfoWindowAdapter(new PopupAdapter(getLayoutInflater()));
+
         mMap.setOnInfoWindowClickListener(this);
         Toast.makeText(this, "Welcome", Toast.LENGTH_SHORT).show();
         initiateMyLocationPolling();
