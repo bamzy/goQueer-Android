@@ -18,8 +18,10 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 
 import android.location.Location;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -496,7 +498,7 @@ public class MapActivity extends AppCompatActivity implements
                 .position(new LatLng(location.getLatitude(),location.getLongitude()))
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin6)));
 
-        checkNearLocation(location);
+        checkNearLocation(mCurrentLocation);
 
     }
 
@@ -513,7 +515,11 @@ public class MapActivity extends AppCompatActivity implements
                         @Override
                         public void onSuccess(boolean status) {
 
-                            showAlert("Info!","You found something!");
+                            showAlert("Info!","You found something! wait...");
+                            MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.chime);
+                            Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                            vib.vibrate(1000);
+                            mp.start();
 
                         }
 
@@ -537,7 +543,11 @@ public class MapActivity extends AppCompatActivity implements
                         @Override
                         public void onSuccess(boolean status) {
 
-                            showAlert("Info!","You found something!");
+                            showAlert("Info!","You found something! wait...");
+                            MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.chime);
+                            Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                            vib.vibrate(1000);
+                            mp.start();
 
                         }
 
@@ -554,7 +564,9 @@ public class MapActivity extends AppCompatActivity implements
     }
 
     private boolean alreadyDiscovered(QLocation allLocation) {
-        for (QLocation discoveredLocation : discoveredLocations) {
+        if (realDiscoveredLocations == null )
+            return false;
+        for (QLocation discoveredLocation : realDiscoveredLocations) {
             if (allLocation.getId() == discoveredLocation.getId())
                 return true;
         }
@@ -871,6 +883,7 @@ public class MapActivity extends AppCompatActivity implements
                                 }
                                 discoveredLocations = null;
                                 discoveredLocations = queerLocations;
+                                realDiscoveredLocations = discoveredLocations;
 
                                 processReceivedLocations();
                             }
@@ -903,7 +916,7 @@ public class MapActivity extends AppCompatActivity implements
                         }, getDefinedLocation());
 
                     }
-                    if (getDefinedLocation().getShow().equalsIgnoreCase("2")){
+                    if (getDefinedLocation().getShow().equalsIgnoreCase("2") || getDefinedLocation().getShow().equalsIgnoreCase("1")){
                         queerClient.getMyLocations(new VolleyMyCoordinatesCallback() {
                             @Override
                             public void onSuccess(QLocation[] queerLocations) {

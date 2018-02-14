@@ -46,6 +46,10 @@ public class QueerClient {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        if (response.equalsIgnoreCase("[]")) {
+                            volleyMyCoordinatesCallback.onSuccess(null);
+                            return;
+                        }
                         Gson gson = new Gson();
                         if (response.length() !=0) {
                             QLocation[] discoveredQLocations = gson.fromJson(response, QLocation[].class);
@@ -186,6 +190,8 @@ public class QueerClient {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                       if ("Failed".equalsIgnoreCase(response))
+                           volleySetDiscoveryCallback.onError();
                         volleySetDiscoveryCallback.onSuccess(true);
 
                     }
