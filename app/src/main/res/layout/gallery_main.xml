@@ -34,15 +34,15 @@
         android:adjustViewBounds="true"
          />
     <TextView
-    android:id="@+id/descriptionTitle"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginLeft="20dp"
-    android:layout_marginTop="10dp"
-    android:textColor="@android:color/darker_gray"
-    android:text="Description:"/>
+        android:id="@+id/descriptionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:textColor="@android:color/darker_gray"
+        android:text="Description:"
+        />
     <TextView
-
         android:id="@+id/mediaDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -51,10 +51,29 @@
         android:layout_marginBottom="20dp"
         android:scrollbars = "vertical"
         android:textColor="@android:color/black"
-
         android:textSize="15dp"
-
          />
+    <TextView
+        android:id="@+id/linkTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:textColor="@android:color/darker_gray"
+        android:visibility="gone"
+        android:text="Additional Links:"
+        />
+    <TextView
+        android:id="@+id/mediaLink"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:autoLink="web"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/wallet_holo_blue_light"
+        android:visibility="gone"
+        />
 </LinearLayout>
 </ScrollView>
     <android.support.design.widget.FloatingActionButton android:id="@+id/next"

@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -47,7 +48,7 @@ public class GalleryActivity extends AppCompatActivity implements
     private QueerClient queerClient;
     private int currentIndex;
     boolean isImageFitToScreen;
-    private TextView mediaTitle, mediaDescription,pageNumber;
+    private TextView mediaTitle, mediaDescription,pageNumber,mediaLink,linkTitle;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -58,6 +59,8 @@ public class GalleryActivity extends AppCompatActivity implements
         mainMediaImage = (ImageView) findViewById(R.id.mainMediaImage);
         mediaTitle = (TextView) findViewById(R.id.mediaTitle);
         mediaDescription = (TextView) findViewById(R.id.mediaDescription);
+        mediaLink = (TextView) findViewById(R.id.mediaLink);
+        linkTitle = (TextView) findViewById(R.id.linkTitle);
         pageNumber = (TextView) findViewById(R.id.pageNumber);
         currentIndex = 0;
 
@@ -134,6 +137,19 @@ public class GalleryActivity extends AppCompatActivity implements
                         .asGif()
                         .load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + gallery.getMedias().get(currentIndex).getId())
                         .into((ImageView) findViewById(R.id.mainMediaImage));
+            if ("1".equalsIgnoreCase(gallery.getMedias().get(currentIndex).getType_id())){
+                linkTitle.setVisibility(View.VISIBLE);
+                mediaLink.setVisibility(View.VISIBLE);
+                mediaLink.setText(gallery.getMedias().get(currentIndex).getMedia_url());
+                mediaLink.setMovementMethod(LinkMovementMethod.getInstance());
+            } else {
+                linkTitle.setVisibility(View.GONE);
+                mediaLink.setVisibility(View.GONE);
+                mediaLink.setText("");
+
+            }
+
+
             mainMediaImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
