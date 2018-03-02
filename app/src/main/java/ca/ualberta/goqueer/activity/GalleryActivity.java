@@ -28,6 +28,8 @@ import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
+import com.google.android.youtube.player.YouTubeBaseActivity;
+import com.google.android.youtube.player.YouTubePlayerView;
 import com.squareup.picasso.Picasso;
 
 
@@ -41,9 +43,10 @@ import entity.QGallery;
  * Created by Circa Lab on 3/18/2017.
  */
 
-public class GalleryActivity extends AppCompatActivity implements
+public class GalleryActivity extends YouTubeBaseActivity implements
         NavigationView.OnNavigationItemSelectedListener{
     private ImageView mainMediaImage;
+    private YouTubePlayerView mainMediaVideo;
     public static QGallery gallery;
     private QueerClient queerClient;
     private int currentIndex;
@@ -62,6 +65,7 @@ public class GalleryActivity extends AppCompatActivity implements
         mediaLink = (TextView) findViewById(R.id.mediaLink);
         linkTitle = (TextView) findViewById(R.id.linkTitle);
         pageNumber = (TextView) findViewById(R.id.pageNumber);
+        mainMediaVideo = findViewById(R.id.mainMediaVideo);
         currentIndex = 0;
 
 
@@ -137,9 +141,12 @@ public class GalleryActivity extends AppCompatActivity implements
                         .asGif()
                         .load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + gallery.getMedias().get(currentIndex).getId())
                         .into((ImageView) findViewById(R.id.mainMediaImage));
+
             if ("1".equalsIgnoreCase(gallery.getMedias().get(currentIndex).getType_id())){
                 linkTitle.setVisibility(View.VISIBLE);
                 mediaLink.setVisibility(View.VISIBLE);
+                mainMediaVideo.setVisibility(View.VISIBLE);
+                mainMediaVideo.l
                 mediaLink.setText(gallery.getMedias().get(currentIndex).getMedia_url());
                 mediaLink.setMovementMethod(LinkMovementMethod.getInstance());
             } else {
