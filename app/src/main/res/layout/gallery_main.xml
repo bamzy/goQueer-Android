@@ -68,11 +68,54 @@
         android:layout_marginLeft="20dp"
         android:layout_marginTop="10dp"
         android:textColor="@android:color/darker_gray"
-        android:visibility="gone"
         android:text="Additional Links:"
         />
     <TextView
-        android:id="@+id/mediaLink"
+        android:id="@+id/externalLink1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:autoLink="web"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/wallet_holo_blue_light"
+        android:visibility="gone"
+        />
+    <TextView
+        android:id="@+id/externalLink2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:autoLink="web"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/wallet_holo_blue_light"
+        android:visibility="gone"
+        />
+    <TextView
+        android:id="@+id/externalLink3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:autoLink="web"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/wallet_holo_blue_light"
+        android:visibility="gone"
+        />
+    <TextView
+        android:id="@+id/externalLink4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:autoLink="web"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/wallet_holo_blue_light"
+        android:visibility="gone"
+        />
+    <TextView
+        android:id="@+id/externalLink5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text=""

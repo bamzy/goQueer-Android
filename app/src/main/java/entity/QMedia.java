@@ -13,6 +13,7 @@ public class QMedia {
     private String display_date;
     private String type_id;
     private String media_url;
+    private String external_url;
 
     public String getType_id() { return type_id; }
 
@@ -33,4 +34,8 @@ public class QMedia {
     }
 
     public String getMedia_url() {return media_url;}
+
+    public String getExternal_url() {
+        return external_url;
+    }
 }

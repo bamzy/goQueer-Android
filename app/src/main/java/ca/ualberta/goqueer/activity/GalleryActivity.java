@@ -11,12 +11,10 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -57,7 +55,7 @@ public class GalleryActivity extends YouTubeBaseActivity implements
     private QueerClient queerClient;
     private int currentIndex;
     boolean isImageFitToScreen;
-    private TextView mediaTitle, mediaDescription,pageNumber,mediaLink,linkTitle;
+    private TextView mediaTitle, mediaDescription,pageNumber, extraLink1, extraLink2, extraLink3, extraLink4, extraLink5,linkTitle;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -68,7 +66,11 @@ public class GalleryActivity extends YouTubeBaseActivity implements
         mainMediaImage = (ImageView) findViewById(R.id.mainMediaImage);
         mediaTitle = (TextView) findViewById(R.id.mediaTitle);
         mediaDescription = (TextView) findViewById(R.id.mediaDescription);
-        mediaLink = (TextView) findViewById(R.id.mediaLink);
+        extraLink1 = (TextView) findViewById(R.id.externalLink1);
+        extraLink2 = (TextView) findViewById(R.id.externalLink2);
+        extraLink3 = (TextView) findViewById(R.id.externalLink3);
+        extraLink4 = (TextView) findViewById(R.id.externalLink4);
+        extraLink5 = (TextView) findViewById(R.id.externalLink5);
         linkTitle = (TextView) findViewById(R.id.linkTitle);
         pageNumber = (TextView) findViewById(R.id.pageNumber);
         mainMediaVideo = (YouTubePlayerView) findViewById(R.id.mainMediaVideo);
@@ -143,9 +145,36 @@ public class GalleryActivity extends YouTubeBaseActivity implements
             mediaDescription.setText(gallery.getMedias().get(currentIndex).getDescription() );
             mediaDescription.setMovementMethod(new ScrollingMovementMethod());
 
+            String[] links = gallery.getMedias().get(currentIndex).getExternal_url().split(";");
+            switch (links.length) {
+                case 5:
+                    extraLink5.setVisibility(View.VISIBLE);
+                    extraLink5.setText(links[4]);
+                    extraLink5.setMovementMethod(LinkMovementMethod.getInstance());
+                case 4:
+                    extraLink4.setVisibility(View.VISIBLE);
+                    extraLink4.setText(links[3]);
+                    extraLink4.setMovementMethod(LinkMovementMethod.getInstance());
+                case 3:
+                    extraLink3.setVisibility(View.VISIBLE);
+                    extraLink3.setText(links[2]);
+                    extraLink3.setMovementMethod(LinkMovementMethod.getInstance());
+                case 2:
+                    extraLink2.setVisibility(View.VISIBLE);
+                    extraLink2.setText(links[1]);
+                    extraLink2.setMovementMethod(LinkMovementMethod.getInstance());
+                case 1:
+                    extraLink1.setVisibility(View.VISIBLE);
+                    extraLink1.setText(links[0]);
+                    extraLink1.setMovementMethod(LinkMovementMethod.getInstance());
+                    break;
+
+            }
+
             if ("4".equalsIgnoreCase(gallery.getMedias().get(currentIndex).getType_id())) {
                 mainMediaImage.setVisibility(View.VISIBLE);
                 mainMediaVideo.setVisibility(View.GONE);
+
                 Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + gallery.getMedias().get(currentIndex).getId()).into(mainMediaImage);
             }
             if ("5".equalsIgnoreCase(gallery.getMedias().get(currentIndex).getType_id())) {
@@ -158,11 +187,10 @@ public class GalleryActivity extends YouTubeBaseActivity implements
             }
             if ("1".equalsIgnoreCase(gallery.getMedias().get(currentIndex).getType_id())){
                 linkTitle.setVisibility(View.VISIBLE);
-                mediaLink.setVisibility(View.VISIBLE);
                 mainMediaVideo.setVisibility(View.VISIBLE);
                 mainMediaImage.setVisibility(View.GONE);
-                mediaLink.setText(gallery.getMedias().get(currentIndex).getMedia_url());
-                mediaLink.setMovementMethod(LinkMovementMethod.getInstance());
+
+
                 mainMediaVideo.initialize("AIzaSyA2ifrG3Xnv_gafk_PCOYSRAxB9sjRyS_Y",new YouTubePlayer.OnInitializedListener() {
 
                     @Override
@@ -191,8 +219,8 @@ public class GalleryActivity extends YouTubeBaseActivity implements
             } else {
                 mainMediaVideo.setVisibility(View.GONE);
                 linkTitle.setVisibility(View.GONE);
-                mediaLink.setVisibility(View.GONE);
-                mediaLink.setText("");
+                extraLink1.setVisibility(View.GONE);
+                extraLink1.setText("");
 
             }
 
