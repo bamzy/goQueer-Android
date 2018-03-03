@@ -798,7 +798,8 @@ public class MapActivity extends AppCompatActivity implements
                         }
 
                         @Override
-                        public void onError(VolleyError result) {
+                        public void onError(
+                                VolleyError result) {
 
                         }
                     });

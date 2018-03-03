@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,9 +30,14 @@ import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
 import com.google.android.youtube.player.YouTubeBaseActivity;
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerView;
 import com.squareup.picasso.Picasso;
 
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import ca.ualberta.goqueer.R;
 import ca.ualberta.goqueer.config.Constants;
@@ -44,7 +50,7 @@ import entity.QGallery;
  */
 
 public class GalleryActivity extends YouTubeBaseActivity implements
-        NavigationView.OnNavigationItemSelectedListener{
+        NavigationView.OnNavigationItemSelectedListener,YouTubePlayer.OnInitializedListener{
     private ImageView mainMediaImage;
     private YouTubePlayerView mainMediaVideo;
     public static QGallery gallery;
@@ -65,13 +71,14 @@ public class GalleryActivity extends YouTubeBaseActivity implements
         mediaLink = (TextView) findViewById(R.id.mediaLink);
         linkTitle = (TextView) findViewById(R.id.linkTitle);
         pageNumber = (TextView) findViewById(R.id.pageNumber);
-        mainMediaVideo = findViewById(R.id.mainMediaVideo);
+        mainMediaVideo = (YouTubePlayerView) findViewById(R.id.mainMediaVideo);
+
         currentIndex = 0;
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.gallery_toolbar);
 
-        setSupportActionBar(toolbar);
+//        setSupportActionBar(toolbar);
 
 
 
@@ -119,6 +126,8 @@ public class GalleryActivity extends YouTubeBaseActivity implements
         }, 1000);
     }
 
+
+
     @Override
     public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
         View view = super.onCreateView(parent, name, context, attrs);
@@ -134,22 +143,53 @@ public class GalleryActivity extends YouTubeBaseActivity implements
             mediaDescription.setText(gallery.getMedias().get(currentIndex).getDescription() );
             mediaDescription.setMovementMethod(new ScrollingMovementMethod());
 
-            if ("4".equalsIgnoreCase(gallery.getMedias().get(currentIndex).getType_id()))
-                Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id="+ gallery.getMedias().get(currentIndex).getId()).into(mainMediaImage);
-            if ("5".equalsIgnoreCase(gallery.getMedias().get(currentIndex).getType_id()))
+            if ("4".equalsIgnoreCase(gallery.getMedias().get(currentIndex).getType_id())) {
+                mainMediaImage.setVisibility(View.VISIBLE);
+                mainMediaVideo.setVisibility(View.GONE);
+                Picasso.with(getApplicationContext()).load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + gallery.getMedias().get(currentIndex).getId()).into(mainMediaImage);
+            }
+            if ("5".equalsIgnoreCase(gallery.getMedias().get(currentIndex).getType_id())) {
+                mainMediaImage.setVisibility(View.VISIBLE);
+                mainMediaVideo.setVisibility(View.GONE);
                 Glide.with(getApplicationContext())
                         .asGif()
                         .load(Constants.GO_QUEER_BASE_SERVER_URL + "client/downloadMediaById?media_id=" + gallery.getMedias().get(currentIndex).getId())
                         .into((ImageView) findViewById(R.id.mainMediaImage));
-
+            }
             if ("1".equalsIgnoreCase(gallery.getMedias().get(currentIndex).getType_id())){
                 linkTitle.setVisibility(View.VISIBLE);
                 mediaLink.setVisibility(View.VISIBLE);
                 mainMediaVideo.setVisibility(View.VISIBLE);
-                mainMediaVideo.l
+                mainMediaImage.setVisibility(View.GONE);
                 mediaLink.setText(gallery.getMedias().get(currentIndex).getMedia_url());
                 mediaLink.setMovementMethod(LinkMovementMethod.getInstance());
+                mainMediaVideo.initialize("AIzaSyA2ifrG3Xnv_gafk_PCOYSRAxB9sjRyS_Y",new YouTubePlayer.OnInitializedListener() {
+
+                    @Override
+                    public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
+                        youTubePlayer.setFullscreenControlFlags(YouTubePlayer.FULLSCREEN_FLAG_CUSTOM_LAYOUT);
+                        if(!b){
+                            String media_url = gallery.getMedias().get(currentIndex).getMedia_url();
+                            if (media_url.length()>11)
+                            youTubePlayer.cueVideo(extractVideoIdFromUrl(media_url));
+//                            youTubePlayer.cueVideo("G2W41pvvZs0");
+                        }
+                        youTubePlayer.setOnFullscreenListener(new YouTubePlayer.OnFullscreenListener(){
+                            @Override
+                            public void onFullscreen(boolean arg0) {
+                            }});
+
+                    }
+
+                    @Override
+                    public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
+                        // TODO Auto-generated method stub
+                    }
+
+
+                });
             } else {
+                mainMediaVideo.setVisibility(View.GONE);
                 linkTitle.setVisibility(View.GONE);
                 mediaLink.setVisibility(View.GONE);
                 mediaLink.setText("");
@@ -176,6 +216,35 @@ public class GalleryActivity extends YouTubeBaseActivity implements
         }
 
 
+    }
+
+
+
+    final String youTubeUrlRegEx = "^(https?)?(://)?(www.)?(m.)?((youtube.com)|(youtu.be))/";
+    final String[] videoIdRegex = { "\\?vi?=([^&]*)","watch\\?.*v=([^&]*)", "(?:embed|vi?)/([^/?]*)", "^([A-Za-z0-9\\-]*)"};
+
+    public String extractVideoIdFromUrl(String url) {
+        String youTubeLinkWithoutProtocolAndDomain = youTubeLinkWithoutProtocolAndDomain(url);
+
+        for(String regex : videoIdRegex) {
+            Pattern compiledPattern = Pattern.compile(regex);
+            Matcher matcher = compiledPattern.matcher(youTubeLinkWithoutProtocolAndDomain);
+
+            if(matcher.find()){
+                return matcher.group(1);
+            }
+        }
+
+        return null;
+    }
+    private String youTubeLinkWithoutProtocolAndDomain(String url) {
+        Pattern compiledPattern = Pattern.compile(youTubeUrlRegEx);
+        Matcher matcher = compiledPattern.matcher(url);
+
+        if(matcher.find()){
+            return url.replace(matcher.group(), "");
+        }
+        return url;
     }
 
     @Override
@@ -258,5 +327,23 @@ public class GalleryActivity extends YouTubeBaseActivity implements
                 .show();
     }
 
+
+    @Override
+    public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
+
+            if (!b) {
+                youTubePlayer.cueVideo("fhWaJi1Hsfo"); // Plays https://www.youtube.com/watch?v=fhWaJi1Hsfo
+            }
+    }
+
+    @Override
+    public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
+
+            if (youTubeInitializationResult.isUserRecoverableError()) {
+                youTubeInitializationResult.getErrorDialog(this, 1).show();
+            } else {
+                Toast.makeText(this, "Error initializing YouTube player", Toast.LENGTH_LONG).show();
+            }
+    }
 
 }
