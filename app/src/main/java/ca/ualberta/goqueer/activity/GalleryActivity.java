@@ -170,6 +170,17 @@ public class GalleryActivity extends YouTubeBaseActivity implements
                         break;
 
                 }
+            } else {
+                extraLink1.setVisibility(View.GONE);
+                extraLink2.setVisibility(View.GONE);
+                extraLink3.setVisibility(View.GONE);
+                extraLink4.setVisibility(View.GONE);
+                extraLink5.setVisibility(View.GONE);
+                extraLink1.setText("");
+                extraLink2.setText("");
+                extraLink3.setText("");
+                extraLink4.setText("");
+                extraLink5.setText("");
             }
             if ("4".equalsIgnoreCase(gallery.getMedias().get(currentIndex).getType_id())) {
                 mainMediaImage.setVisibility(View.VISIBLE);
