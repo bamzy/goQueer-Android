@@ -144,33 +144,33 @@ public class GalleryActivity extends YouTubeBaseActivity implements
             pageNumber.setText("(" +(currentIndex+1) + "/" + gallery.getMedias().size() + ")");
             mediaDescription.setText(gallery.getMedias().get(currentIndex).getDescription() );
             mediaDescription.setMovementMethod(new ScrollingMovementMethod());
+            if (gallery.getMedias().get(currentIndex).getExtra_links() != null) {
+                String[] links = gallery.getMedias().get(currentIndex).getExtra_links().split(";");
+                switch (links.length) {
+                    case 5:
+                        extraLink5.setVisibility(View.VISIBLE);
+                        extraLink5.setText(links[4]);
+                        extraLink5.setMovementMethod(LinkMovementMethod.getInstance());
+                    case 4:
+                        extraLink4.setVisibility(View.VISIBLE);
+                        extraLink4.setText(links[3]);
+                        extraLink4.setMovementMethod(LinkMovementMethod.getInstance());
+                    case 3:
+                        extraLink3.setVisibility(View.VISIBLE);
+                        extraLink3.setText(links[2]);
+                        extraLink3.setMovementMethod(LinkMovementMethod.getInstance());
+                    case 2:
+                        extraLink2.setVisibility(View.VISIBLE);
+                        extraLink2.setText(links[1]);
+                        extraLink2.setMovementMethod(LinkMovementMethod.getInstance());
+                    case 1:
+                        extraLink1.setVisibility(View.VISIBLE);
+                        extraLink1.setText(links[0]);
+                        extraLink1.setMovementMethod(LinkMovementMethod.getInstance());
+                        break;
 
-            String[] links = gallery.getMedias().get(currentIndex).getExternal_url().split(";");
-            switch (links.length) {
-                case 5:
-                    extraLink5.setVisibility(View.VISIBLE);
-                    extraLink5.setText(links[4]);
-                    extraLink5.setMovementMethod(LinkMovementMethod.getInstance());
-                case 4:
-                    extraLink4.setVisibility(View.VISIBLE);
-                    extraLink4.setText(links[3]);
-                    extraLink4.setMovementMethod(LinkMovementMethod.getInstance());
-                case 3:
-                    extraLink3.setVisibility(View.VISIBLE);
-                    extraLink3.setText(links[2]);
-                    extraLink3.setMovementMethod(LinkMovementMethod.getInstance());
-                case 2:
-                    extraLink2.setVisibility(View.VISIBLE);
-                    extraLink2.setText(links[1]);
-                    extraLink2.setMovementMethod(LinkMovementMethod.getInstance());
-                case 1:
-                    extraLink1.setVisibility(View.VISIBLE);
-                    extraLink1.setText(links[0]);
-                    extraLink1.setMovementMethod(LinkMovementMethod.getInstance());
-                    break;
-
+                }
             }
-
             if ("4".equalsIgnoreCase(gallery.getMedias().get(currentIndex).getType_id())) {
                 mainMediaImage.setVisibility(View.VISIBLE);
                 mainMediaVideo.setVisibility(View.GONE);
