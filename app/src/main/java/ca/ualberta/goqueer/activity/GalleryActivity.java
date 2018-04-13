@@ -145,6 +145,7 @@ public class GalleryActivity extends YouTubeBaseActivity implements
             mediaDescription.setText(gallery.getMedias().get(currentIndex).getDescription() );
             mediaDescription.setMovementMethod(new ScrollingMovementMethod());
             if (gallery.getMedias().get(currentIndex).getExtra_links() != null) {
+                linkTitle.setVisibility(View.VISIBLE);
                 String[] links = gallery.getMedias().get(currentIndex).getExtra_links().split(";");
                 switch (links.length) {
                     case 5:
@@ -181,6 +182,7 @@ public class GalleryActivity extends YouTubeBaseActivity implements
                 extraLink3.setText("");
                 extraLink4.setText("");
                 extraLink5.setText("");
+                linkTitle.setVisibility(View.GONE);
             }
             if ("4".equalsIgnoreCase(gallery.getMedias().get(currentIndex).getType_id())) {
                 mainMediaImage.setVisibility(View.VISIBLE);
@@ -197,7 +199,6 @@ public class GalleryActivity extends YouTubeBaseActivity implements
                         .into((ImageView) findViewById(R.id.mainMediaImage));
             }
             if ("1".equalsIgnoreCase(gallery.getMedias().get(currentIndex).getType_id())){
-                linkTitle.setVisibility(View.VISIBLE);
                 mainMediaVideo.setVisibility(View.VISIBLE);
                 mainMediaImage.setVisibility(View.GONE);
 
@@ -227,12 +228,6 @@ public class GalleryActivity extends YouTubeBaseActivity implements
 
 
                 });
-            } else {
-                mainMediaVideo.setVisibility(View.GONE);
-                linkTitle.setVisibility(View.GONE);
-                extraLink1.setVisibility(View.GONE);
-                extraLink1.setText("");
-
             }
 
 
