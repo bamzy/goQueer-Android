@@ -501,7 +501,7 @@ public class MapActivity extends AppCompatActivity implements
         checkNearLocation(mCurrentLocation);
 
     }
-
+    private static boolean showAlertFlag = true;
     private void checkNearLocation(Location location) {
         if (allLocations == null)
             return;
@@ -510,18 +510,20 @@ public class MapActivity extends AppCompatActivity implements
                 Location associatedLocation = new Location("");
                 associatedLocation.setLatitude(allLocation.getQCoordinates().getCoordinates().get(0).getLat());
                 associatedLocation.setLongitude(allLocation.getQCoordinates().getCoordinates().get(0).getLon());
-                if (associatedLocation.distanceTo(location) < 10 && !alreadyDiscovered(allLocation)) {
+                if (associatedLocation.distanceTo(location) < 20 && !alreadyDiscovered(allLocation)) {
                     queerClient.setDiscoveryStatus(new VolleySetDiscoveryCallback() {
                         @Override
                         public void onSuccess(boolean status) {
 
-                            showAlert("Info!","You found something! wait...");
-                            MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.chime);
-                            Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                            vib.vibrate(1000);
-                            mp.start();
+//                                showAlert("Info!", "You found something! wait...");
+                                Toast.makeText(getApplicationContext(), "You found something! wait...", Toast.LENGTH_SHORT).show();
+                                MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.chime);
+                                Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                vib.vibrate(1000);
+                                mp.start();
+                            }
 
-                        }
+
 
                         @Override
                         public void onError() {
@@ -543,13 +545,15 @@ public class MapActivity extends AppCompatActivity implements
                         @Override
                         public void onSuccess(boolean status) {
 
-                            showAlert("Info!","You found something! wait...");
-                            MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.chime);
-                            Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                            vib.vibrate(1000);
-                            mp.start();
 
-                        }
+//                                showAlert("Info!", "You found something! wait...");
+                                Toast.makeText(getApplicationContext(), "You found something! wait...", Toast.LENGTH_SHORT).show();
+                                MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.chime);
+                                Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                vib.vibrate(1000);
+                                mp.start();
+                            }
+
 
                         @Override
                         public void onError() {
@@ -940,40 +944,42 @@ public class MapActivity extends AppCompatActivity implements
     }
 
     private void processReceivedLocations() {
-        for (QLocation queerLocation : discoveredLocations) {
-            queerLocation.setData_display_mode(getDefinedLocation().getShow());
-            if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POINT) {
-                Coordinate latlog = queerLocation.getQCoordinates().getCoordinates().get(0);
-                LatLng testLocation4 =  new LatLng(latlog.getLat(), latlog.getLon());
+        if (discoveredLocations != null) {
 
-                discoveredMarkers.add(mMap.addMarker(new MarkerOptions()
-                        .position(testLocation4)
-                        .zIndex(queerLocation.getId())
-                        .title(queerLocation.getName())
-                        .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin5))));
-            } else if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POLYGON){
-                PolygonOptions polygonOptions = new PolygonOptions();
-                LatLng temp = new LatLng(0,0);
-                ArrayList<LatLng> cornerList = new ArrayList<>();
-                for (Coordinate coordinate1 : queerLocation.getQCoordinates().getCoordinates()) {
-                    temp = new LatLng(coordinate1.getLat(),coordinate1.getLon());
-                    polygonOptions.add(temp);
-                    cornerList.add(temp);
-                }
-                LatLng center = getPolygonCenterPoint(cornerList);
-                discoveredMarkers.add(mMap.addMarker(new MarkerOptions()
-                                    .position(center)
-                                    .zIndex(queerLocation.getId())
-                                    .title(queerLocation.getName())
-                                    .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin2))
+            for (QLocation queerLocation : discoveredLocations) {
+                queerLocation.setData_display_mode(getDefinedLocation().getShow());
+                if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POINT) {
+                    Coordinate latlog = queerLocation.getQCoordinates().getCoordinates().get(0);
+                    LatLng testLocation4 = new LatLng(latlog.getLat(), latlog.getLon());
+
+                    discoveredMarkers.add(mMap.addMarker(new MarkerOptions()
+                            .position(testLocation4)
+                            .zIndex(queerLocation.getId())
+                            .title(queerLocation.getName())
+                            .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin5))));
+                } else if (queerLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POLYGON) {
+                    PolygonOptions polygonOptions = new PolygonOptions();
+                    LatLng temp = new LatLng(0, 0);
+                    ArrayList<LatLng> cornerList = new ArrayList<>();
+                    for (Coordinate coordinate1 : queerLocation.getQCoordinates().getCoordinates()) {
+                        temp = new LatLng(coordinate1.getLat(), coordinate1.getLon());
+                        polygonOptions.add(temp);
+                        cornerList.add(temp);
+                    }
+                    LatLng center = getPolygonCenterPoint(cornerList);
+                    discoveredMarkers.add(mMap.addMarker(new MarkerOptions()
+                            .position(center)
+                            .zIndex(queerLocation.getId())
+                            .title(queerLocation.getName())
+                            .snippet(queerLocation.getDescription() + "\n" + queerLocation.getAddress())
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin2))
                     ));
 
-                discoveredPolygons.add(mMap.addPolygon(polygonOptions.fillColor(Color.argb(59,77, 78, 79))));
+                    discoveredPolygons.add(mMap.addPolygon(polygonOptions.fillColor(Color.argb(59, 77, 78, 79))));
+                }
             }
         }
-
         Log.w(Constants.LOG_TAG,"Getting My Location Repeated");
         pullMyGalleries(discoveredLocations);
         pullAllLocations();
@@ -994,7 +1000,8 @@ public class MapActivity extends AppCompatActivity implements
 
 
     private void pullMyGalleries(final QLocation[] locations) {
-
+        if (locations == null)
+            return;
         for (QLocation location : locations) {
             queerClient.getMyGalleryInfo(new VolleyMyGalleryInfoCallback() {
                 @Override
@@ -1255,6 +1262,8 @@ public class MapActivity extends AppCompatActivity implements
 
     }
     private boolean hasBeenDiscovered(int id) {
+        if (realDiscoveredLocations == null)
+            return false;
         for (QLocation location : realDiscoveredLocations) {
             if ((long)id == location.getId())
                 return true;
@@ -1264,6 +1273,8 @@ public class MapActivity extends AppCompatActivity implements
     }
 
     private QGallery findAssociatedGallery(Marker marker) {
+        if (discoveredLocations == null)
+            return null;
         for (QLocation discoveredLocation : discoveredLocations) {
             if (marker.getTitle().equals(discoveredLocation.getName())) {
                 for (QGallery myGallery : myGalleries) {
@@ -1320,6 +1331,7 @@ public class MapActivity extends AppCompatActivity implements
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
+                        showAlertFlag = true;
                     }
                 });
         alertDialog.show();
