@@ -210,8 +210,9 @@ public class GalleryActivity extends YouTubeBaseActivity implements
                         youTubePlayer.setFullscreenControlFlags(YouTubePlayer.FULLSCREEN_FLAG_CUSTOM_LAYOUT);
                         if(!b){
                             String media_url = gallery.getMedias().get(currentIndex).getMedia_url();
-                            if (media_url.length()>11)
-                            youTubePlayer.cueVideo(extractVideoIdFromUrl(media_url));
+                            if (media_url != null && media_url.length()>11) {
+                                youTubePlayer.cueVideo(extractVideoIdFromUrl(media_url));
+                            }
 //                            youTubePlayer.cueVideo("G2W41pvvZs0");
                         }
                         youTubePlayer.setOnFullscreenListener(new YouTubePlayer.OnFullscreenListener(){
