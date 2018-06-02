@@ -15,6 +15,8 @@ public class QProfile {
     private float zoom;
     private float tilt;
     private float bearing;
+    private boolean passwordProtected;
+    private String password;
 
     public long getId() {
         return id;
@@ -44,6 +46,14 @@ public class QProfile {
         if (show!= null)
         return show;
         else return "";
+    }
+
+    public boolean isPasswordProtected() {
+        return passwordProtected;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public void setId(long id) {

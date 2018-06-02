@@ -35,11 +35,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -498,24 +500,27 @@ public class MapActivity extends AppCompatActivity implements
                 .position(new LatLng(location.getLatitude(),location.getLongitude()))
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin6)));
 
-        checkNearLocation(mCurrentLocation);
+
 
     }
-    private static boolean showAlertFlag = true;
+    private static ArrayList<Long> notifList = new ArrayList<Long>();
+
     private void checkNearLocation(Location location) {
-        if (allLocations == null)
+        if (allLocations == null || location == null)
             return;
-        for (QLocation allLocation : allLocations) {
+        for (final QLocation allLocation : allLocations) {
             if (allLocation.getQCoordinates().getType() == QCoordinate.CoordinateType.POINT ) {
                 Location associatedLocation = new Location("");
                 associatedLocation.setLatitude(allLocation.getQCoordinates().getCoordinates().get(0).getLat());
                 associatedLocation.setLongitude(allLocation.getQCoordinates().getCoordinates().get(0).getLon());
-                if (associatedLocation.distanceTo(location) < 20 && !alreadyDiscovered(allLocation)) {
+                if (associatedLocation.distanceTo(location) < 30 && !alreadyDiscovered(allLocation)) {
                     queerClient.setDiscoveryStatus(new VolleySetDiscoveryCallback() {
                         @Override
                         public void onSuccess(boolean status) {
 
-//                                showAlert("Info!", "You found something! wait...");
+                                if (notifList.indexOf(allLocation.getId()) != -1)
+                                    return;
+                                notifList.add(allLocation.getId());
                                 Toast.makeText(getApplicationContext(), "You found something! wait...", Toast.LENGTH_SHORT).show();
                                 MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.chime);
                                 Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -721,7 +726,7 @@ public class MapActivity extends AppCompatActivity implements
 
 
 
-    private void showRadioButtonDialog(QProfile[] profiles) {
+    private void showRadioButtonDialog(final QProfile[] profiles) {
 
         // custom dialog
         final Dialog dialog = new Dialog(this);
@@ -738,43 +743,52 @@ public class MapActivity extends AppCompatActivity implements
             rb.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    float zoom = 11,tilt = 40 ,bearing = 0;
-                    inputText =  ((RadioButton)v).getText().toString();
-                    SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("profileName", inputText);
-                    editor.commit();
-                    dialog.dismiss();
-                    for (QProfile profile: allProfiles)
-                        if (profile.getName().equalsIgnoreCase(inputText)) {
-                            editor.putString("profileType", profile.getShow());
-                            editor.putString("profileLat", profile.getLat());
-                            editor.putString("profileLng", profile.getLng());
-                            editor.putFloat("profileBearing", profile.getBearing());
-                            editor.putFloat("profileZoom", profile.getZoom());
-                            editor.putFloat("profileTilt", profile.getTilt());
-                            editor.putLong("profileID", profile.getId());
-                            zoom = profile.getZoom();
-                            tilt = profile.getTilt();
-                            bearing = profile.getBearing();
-                            editor.commit();
-                            if (profile.getCoordinateLatLng() != null) {
-                                initialCameraLocation[0] = profile.getCoordinateLatLng();
+                    float zoom = 11, tilt = 40, bearing = 0;
+                    inputText = ((RadioButton) v).getText().toString();
+                    QProfile selectedProfile = new QProfile();
+                    for (QProfile profile : profiles) {
+                        if (profile.getName().equalsIgnoreCase(inputText))
+                            selectedProfile = profile;
+                    }
+                    if (selectedProfile.isPasswordProtected())
+                        showPasswordDialog(selectedProfile);
+                    else {
+                        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("profileName", inputText);
+                        editor.commit();
+                        dialog.dismiss();
+                        for (QProfile profile : allProfiles)
+                            if (profile.getName().equalsIgnoreCase(inputText)) {
+                                editor.putString("profileType", profile.getShow());
+                                editor.putString("profileLat", profile.getLat());
+                                editor.putString("profileLng", profile.getLng());
+                                editor.putFloat("profileBearing", profile.getBearing());
+                                editor.putFloat("profileZoom", profile.getZoom());
+                                editor.putFloat("profileTilt", profile.getTilt());
+                                editor.putLong("profileID", profile.getId());
+                                zoom = profile.getZoom();
+                                tilt = profile.getTilt();
+                                bearing = profile.getBearing();
+                                editor.commit();
+                                if (profile.getCoordinateLatLng() != null) {
+                                    initialCameraLocation[0] = profile.getCoordinateLatLng();
+                                }
                             }
-                        }
-                    final CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(initialCameraLocation[0])      // Sets the center of the map to location user
-                            .zoom(zoom)                   // Sets the zoom
-                            .bearing(bearing)                // Sets the orientation of the camera to east
-                            .tilt(tilt)                   // Sets the tilt of the camera to 30 degrees
-                            .build();                   // Creates a CameraPosition from the builder
-                    final Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                        }
-                    }, 4000);
+                        final CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(initialCameraLocation[0])      // Sets the center of the map to location user
+                                .zoom(zoom)                   // Sets the zoom
+                                .bearing(bearing)                // Sets the orientation of the camera to east
+                                .tilt(tilt)                   // Sets the tilt of the camera to 30 degrees
+                                .build();                   // Creates a CameraPosition from the builder
+                        final Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                            }
+                        }, 4000);
+                    }
                 }
             });
             rb.setText(stringList.get(i));
@@ -782,6 +796,51 @@ public class MapActivity extends AppCompatActivity implements
         }
 
         dialog.show();
+
+    }
+
+
+    public void showPasswordDialog(QProfile profile)
+    {
+
+
+                LayoutInflater li = LayoutInflater.from(this);
+                View promptsView = li.inflate(R.layout.password_prompt, null);
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                        this);
+
+                // set prompts.xml to alertdialog builder
+                alertDialogBuilder.setView(promptsView);
+
+                final EditText userInput = (EditText) promptsView
+                        .findViewById(R.id.passwordUserInput);
+
+                // set dialog message
+                alertDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,int id) {
+                                        // get user input and set it to result
+                                        // edit text
+//                                        result.setText(userInput.getText());
+                                    }
+                                })
+                        .setNegativeButton("Cancel",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                // create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                // show it
+                alertDialog.show();
+
+
 
     }
 
@@ -860,9 +919,23 @@ public class MapActivity extends AppCompatActivity implements
         mMap.setOnInfoWindowClickListener(this);
         Toast.makeText(this, "Welcome", Toast.LENGTH_SHORT).show();
         initiateMyLocationPolling();
+        initiateDiscoveryPolling();
 
     }
 
+    private void initiateDiscoveryPolling(){
+            int delay = 2000; // delay for 5 sec.
+            int period = 5000; // repeat every 10 secs.
+
+            Timer timer = new Timer();
+
+            timer.scheduleAtFixedRate(new TimerTask() {
+
+                public void run() {
+                    checkNearLocation(mCurrentLocation);
+                }
+            },delay,period);
+    }
 
 
     private void initiateMyLocationPolling() {
@@ -1331,7 +1404,6 @@ public class MapActivity extends AppCompatActivity implements
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        showAlertFlag = true;
                     }
                 });
         alertDialog.show();
