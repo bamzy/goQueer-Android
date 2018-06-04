@@ -750,8 +750,10 @@ public class MapActivity extends AppCompatActivity implements
                         if (profile.getName().equalsIgnoreCase(inputText))
                             selectedProfile = profile;
                     }
-                    if (selectedProfile.isPasswordProtected())
+                    if (selectedProfile.isPasswordProtected()) {
                         showPasswordDialog(selectedProfile);
+                        dialog.dismiss();
+                    }
                     else {
                         SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -800,7 +802,7 @@ public class MapActivity extends AppCompatActivity implements
     }
 
 
-    public void showPasswordDialog(QProfile profile)
+    public void showPasswordDialog(final QProfile profile)
     {
 
 
@@ -822,6 +824,48 @@ public class MapActivity extends AppCompatActivity implements
                         .setPositiveButton("OK",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog,int id) {
+                                        if (userInput.getText().toString().equalsIgnoreCase(profile.getPassword())){
+                                            float zoom = 11, tilt = 40, bearing = 0;
+                                            SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+                                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                                            editor.putString("profileName", inputText);
+                                            editor.commit();
+                                            dialog.dismiss();
+
+                                            editor.putString("profileType", profile.getShow());
+                                            editor.putString("profileLat", profile.getLat());
+                                            editor.putString("profileLng", profile.getLng());
+                                            editor.putFloat("profileBearing", profile.getBearing());
+                                            editor.putFloat("profileZoom", profile.getZoom());
+                                            editor.putFloat("profileTilt", profile.getTilt());
+                                            editor.putLong("profileID", profile.getId());
+                                            zoom = profile.getZoom();
+                                            tilt = profile.getTilt();
+                                            bearing = profile.getBearing();
+                                            editor.commit();
+                                            if (profile.getCoordinateLatLng() != null) {
+                                                initialCameraLocation[0] = profile.getCoordinateLatLng();
+                                            }
+
+                                            final CameraPosition cameraPosition = new CameraPosition.Builder()
+                                                    .target(initialCameraLocation[0])      // Sets the center of the map to location user
+                                                    .zoom(zoom)                   // Sets the zoom
+                                                    .bearing(bearing)                // Sets the orientation of the camera to east
+                                                    .tilt(tilt)                   // Sets the tilt of the camera to 30 degrees
+                                                    .build();                   // Creates a CameraPosition from the builder
+                                            final Handler handler = new Handler();
+                                            handler.postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                                                }
+                                            }, 4000);
+
+                                            Toast.makeText(getApplicationContext(), "Access Granted", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Toast.makeText(getApplicationContext(), "Wrong Password", Toast.LENGTH_SHORT).show();
+                                        }
+
                                         // get user input and set it to result
                                         // edit text
 //                                        result.setText(userInput.getText());
