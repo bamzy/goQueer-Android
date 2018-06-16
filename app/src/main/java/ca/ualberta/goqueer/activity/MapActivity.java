@@ -917,7 +917,7 @@ public class MapActivity extends AppCompatActivity implements
                 public void onSuccess(QProfile[] profiles) {
                     float zoom = 11,tilt = 40 ,bearing = 0;
                     for (QProfile profile: profiles)
-                        if (profile.getName().equalsIgnoreCase(getDefinedLocation().getName()))
+                        if (profile.getId() == getDefinedLocation().getId())
                             if (profile.getCoordinateLatLng()!= null) {
                                 initialCameraLocation[0] = profile.getCoordinateLatLng();
                                 zoom = profile.getZoom();

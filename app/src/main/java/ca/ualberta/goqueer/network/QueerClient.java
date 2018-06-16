@@ -41,7 +41,7 @@ public class QueerClient {
 
 
     public void getMyLocations(final VolleyMyCoordinatesCallback volleyMyCoordinatesCallback, QProfile profile){
-        String myLocationsUrl = url + "/client/getMyLocations?device_id=" + device_id + "&profile_name=" + profile.getName()  ;
+        String myLocationsUrl = url + "/client/getMyLocations?device_id=" + device_id + "&profile_id=" + profile.getId()  ;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, myLocationsUrl,
                 new Response.Listener<String>() {
                     @Override
@@ -98,7 +98,7 @@ public class QueerClient {
 
 
     public void getAllLocations(final VolleyMyCoordinatesCallback volleyMyCoordinatesCallback,QProfile profile){
-        String allLocationsUrl = url + "/client/getAllLocations?device_id=" + device_id+ "&profile_name=" + profile.getName();
+        String allLocationsUrl = url + "/client/getAllLocations?device_id=" + device_id+ "&profile_id=" + profile.getId();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, allLocationsUrl,
                 new Response.Listener<String>() {
                     @Override
@@ -168,7 +168,7 @@ public class QueerClient {
 
 
     public void getHint(final VolleyMyHintCallback volleyMyHintCallback, QProfile profile) {
-        String allLocationsUrl = url + "/client/getHint?device_id=" + device_id +"&profile_name=" + profile.getName();
+        String allLocationsUrl = url + "/client/getHint?device_id=" + device_id +"&profile_id=" + profile.getId();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, allLocationsUrl,
                 new Response.Listener<String>() {
                     @Override
@@ -185,7 +185,7 @@ public class QueerClient {
     }
 
     public void setDiscoveryStatus(final VolleySetDiscoveryCallback volleySetDiscoveryCallback ,long locationId,QProfile profile) {
-        String newurl = url + "/client/setDiscoveryStatus?location_id=" + locationId +"&device_id=" + device_id+ "&profile_name=" + profile.getName()  ;
+        String newurl = url + "/client/setDiscoveryStatus?location_id=" + locationId +"&device_id=" + device_id+ "&profile_id=" + profile.getId()  ;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, newurl,
                 new Response.Listener<String>() {
                     @Override
@@ -205,7 +205,7 @@ public class QueerClient {
     }
 
     public void getDiscoveredSetSummary(final VolleyGetSetSummaryCallback volleyGetSetSummaryCallback , long id,QProfile profile) {
-        String newurl = url + "/client/getSetStatusSummary?gallery_id=" + id +"&device_id=" + device_id+"&profile_name=" + profile.getName()  ;
+        String newurl = url + "/client/getSetStatusSummary?gallery_id=" + id +"&device_id=" + device_id+"&profile_id=" + profile.getId()  ;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, newurl,
                 new Response.Listener<String>() {
                     @Override
